@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"d:\\\\LInranesLittleBox\\\\WorkingAndLearning\\\\PersonalProject\\\\DevTwin\\\\\")",
+      "Read(//d/LInranesLittleBox/WorkingAndLearning/PersonalProject/**)",
+      "WebSearch",
+      "Bash(npm --version)",
+      "Bash(cmd.exe /c \"node --version && npm --version\")"
+    ]
+  }
+}

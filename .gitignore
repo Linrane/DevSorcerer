@@ -1,0 +1,27 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+
+# DevSorcerer data (local databases)
+.vault/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# LanceDB
+.lancedb/
+
+# Build artifacts
+packages/*/dist/
+packages/**/*.js
+packages/**/*.js.map
+packages/**/*.d.ts.map
+
+# Temp
+tmp/
+temp/
