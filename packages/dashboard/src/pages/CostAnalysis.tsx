@@ -13,15 +13,21 @@ export function CostAnalysis() {
     queryFn: () => getSessions({ limit: 50 }),
   });
 
-  const { data: costData } = useQuery({
-    queryKey: ['cost', selectedSessionId || 'all'],
-    queryFn: () =>
-      getCostAnalysis(
+  const { data: costData, isLoading: costLoading } = useQuery({
+    queryKey: ['cost', selectedSessionId || 'all', timeRange],
+    queryFn: () => {
+      const today = new Date().toISOString().split('T')[0];
+      const fromDate =
+        timeRange === '7d' ? new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0] :
+        timeRange === '30d' ? new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0] :
+        timeRange === '90d' ? new Date(Date.now() - 90 * 86400000).toISOString().split('T')[0] :
+        undefined;
+      return getCostAnalysis(
         selectedSessionId
-          ? { session_id: selectedSessionId }
-          : { project_id: 'all' },
-      ),
-    enabled: !!selectedSessionId,
+          ? { session_id: selectedSessionId, from: fromDate, to: today }
+          : { project_id: 'all', from: fromDate, to: today },
+      );
+    },
   });
 
   const sessions = sessionsData?.sessions || [];

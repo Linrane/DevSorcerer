@@ -14,6 +14,9 @@ export function AuditExport() {
     queryFn: () => getSessions({ limit: 50 }),
   });
 
+  const sessions = sessionsData?.sessions || [];
+  const projects = [...new Set(sessions.map((s) => s.projectId).filter(Boolean))];
+
   const handleExport = async () => {
     setExporting(true);
     try {
@@ -108,7 +111,9 @@ export function AuditExport() {
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200"
           >
             <option value="">All Projects</option>
-            {/* Options populated from sessions */}
+            {projects.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
           </select>
         </div>
 

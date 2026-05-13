@@ -22,12 +22,12 @@ export function QualityTimelineChart() {
         { subject: 'Acceptance', value: q.acceptanceRate, fullMark: 100 },
         {
           subject: 'Low Rollback',
-          value: Math.max(0, 100 - (q.rollbackCount * 20)),
+          value: Math.max(0, 100 - ((q.rollbackCount ?? 0) * 20)),
           fullMark: 100,
         },
         { subject: 'Low Bugs', value: q.bugCount ? Math.max(0, 100 - q.bugCount * 10) : 100, fullMark: 100 },
-        { subject: 'Created', value: Math.min(100, q.filesCreated * 10), fullMark: 100 },
-        { subject: 'Modified', value: Math.min(100, q.filesModified * 10), fullMark: 100 },
+        { subject: 'Created', value: Math.min(100, (q.filesCreated ?? 0) * 10), fullMark: 100 },
+        { subject: 'Modified', value: Math.min(100, (q.filesModified ?? 0) * 10), fullMark: 100 },
       ]
     : [];
 

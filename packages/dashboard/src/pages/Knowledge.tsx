@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { searchKnowledge } from '../api/client';
-import { Search, Clock, FileCode, Hash } from 'lucide-react';
+import { Search, Clock, FileCode, Hash, Sparkles } from 'lucide-react';
 import type { SearchResult } from '../api/client';
 
 export function Knowledge() {
@@ -22,12 +22,14 @@ export function Knowledge() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">Knowledge Search</h2>
+      <h2 className="text-xl font-semibold flex items-center gap-2">
+        <Sparkles size={22} /> Knowledge Search
+      </h2>
       <p className="text-sm text-gray-500">
-        Search across all historical AI sessions to find how problems were solved.
+        Semantic search across all historical AI sessions. Find how similar problems were solved, what patterns worked, and reuse past solutions.
       </p>
 
-      <form onSubmit={handleSearch} className="flex gap-3">
+      <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search
             size={18}
@@ -37,35 +39,43 @@ export function Knowledge() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder='Search reasoning patterns, e.g. "concurrent lock competition" or "OAuth implementation"...'
+            placeholder='Search patterns, e.g. "concurrent lock" or "OAuth implementation"...'
             className="w-full pl-12 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-600 focus:outline-none focus:border-purple-500 text-sm"
           />
         </div>
-        <button
-          type="submit"
-          className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-sm font-medium transition-colors"
-        >
-          Search
-        </button>
-        <button
-          type="button"
-          onClick={() => setHybrid(!hybrid)}
-          className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors border ${
-            hybrid
-              ? 'bg-purple-600/20 border-purple-500/50 text-purple-300'
-              : 'bg-gray-900 border-gray-700 text-gray-500'
-          }`}
-        >
-          Hybrid
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-sm font-medium transition-colors flex-shrink-0"
+          >
+            Search
+          </button>
+          <button
+            type="button"
+            onClick={() => setHybrid(!hybrid)}
+            className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors border flex-shrink-0 ${
+              hybrid
+                ? 'bg-purple-600/20 border-purple-500/50 text-purple-300'
+                : 'bg-gray-900 border-gray-700 text-gray-500 hover:border-gray-600'
+            }`}
+            title="Hybrid = vector similarity + keyword matching"
+          >
+            Hybrid
+          </button>
+        </div>
       </form>
 
       {/* Results */}
       {isLoading && (
-        <div className="text-gray-500 p-8 text-center">Searching knowledge base...</div>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="skeleton h-24 rounded-xl" />
+          ))}
+        </div>
       )}
+
       {isError && (
-        <div className="text-red-400 p-4 bg-red-500/10 rounded-lg">
+        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
           Search failed: {error instanceof Error ? error.message : 'Unknown error'}
         </div>
       )}
@@ -73,7 +83,7 @@ export function Knowledge() {
       {data && (
         <div>
           <p className="text-sm text-gray-500 mb-4">
-            {data.results.length} results in {data.tookMs}ms
+            {data.results.length} result{data.results.length !== 1 ? 's' : ''} in {data.tookMs}ms
           </p>
           <div className="space-y-4">
             {data.results.map((result: SearchResult, i: number) => (
@@ -87,7 +97,17 @@ export function Knowledge() {
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center text-gray-500">
           <Search size={48} className="mx-auto mb-3 text-gray-700" />
           <p>No results found for "{searchQuery}"</p>
-          <p className="text-sm mt-1">Try different keywords or a broader query.</p>
+          <p className="text-sm mt-1">Try different keywords, a broader query, or toggle Hybrid search off.</p>
+        </div>
+      )}
+
+      {!searchQuery && (
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center text-gray-500">
+          <Sparkles size={48} className="mx-auto mb-3 text-gray-700" />
+          <p>Enter a query to search across all AI sessions</p>
+          <p className="text-sm mt-1 max-w-md mx-auto">
+            The knowledge engine uses AI embeddings to find semantically similar solutions, even when keywords don't match exactly.
+          </p>
         </div>
       )}
     </div>
@@ -102,11 +122,11 @@ function ResultCard({ result, index }: { result: SearchResult; index: number }) 
   return (
     <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 hover:border-gray-700 transition-colors">
       <div className="flex items-start gap-3">
-        <span className="text-xs text-gray-600 font-mono w-6 pt-1">{index + 1}</span>
+        <span className="text-xs text-gray-600 font-mono w-6 pt-1 flex-shrink-0">{index + 1}</span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="px-2 py-0.5 text-xs rounded bg-purple-500/10 text-purple-400">
-              {result.chunk.toolName}
+              {result.chunk.toolName || 'unknown'}
             </span>
             <span className="text-xs text-gray-600 flex items-center gap-1">
               <Hash size={12} />
@@ -116,8 +136,8 @@ function ResultCard({ result, index }: { result: SearchResult; index: number }) 
               <Clock size={12} />
               {date}
             </span>
-            <span className="text-xs text-gray-700">
-              Score: {result.score.toFixed(3)}
+            <span className="text-xs text-gray-700 font-mono">
+              {(result.score * 100).toFixed(1)}% match
             </span>
           </div>
           <p className="text-gray-300 text-sm line-clamp-3">{result.chunk.text}</p>
@@ -128,9 +148,17 @@ function ResultCard({ result, index }: { result: SearchResult; index: number }) 
             </p>
           )}
           {result.contextBefore && (
-            <p className="mt-2 text-xs text-gray-600 italic">
-              ...{result.contextBefore.slice(-80)}...
-            </p>
+            <details className="mt-2">
+              <summary className="text-xs text-gray-600 cursor-pointer hover:text-gray-400">
+                Show context
+              </summary>
+              <p className="mt-1 text-xs text-gray-500 bg-gray-800/50 rounded p-2 italic">
+                {result.contextBefore}
+                {result.contextAfter && (
+                  <> ... <span className="text-yellow-400/50">{result.contextAfter}</span></>
+                )}
+              </p>
+            </details>
           )}
         </div>
       </div>

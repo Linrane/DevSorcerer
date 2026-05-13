@@ -231,6 +231,11 @@ export interface ProjectQuality {
   rollbackRate: number;
   aiBugRate: number;
   totalAiCommits: number;
+  filesCreated?: number;
+  filesModified?: number;
+  filesAccepted?: number;
+  rollbackCount?: number;
+  bugCount?: number | null;
 }
 
 export interface SearchResult {
