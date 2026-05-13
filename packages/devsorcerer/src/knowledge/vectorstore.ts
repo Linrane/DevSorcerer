@@ -152,7 +152,7 @@ export class LanceDBVectorStore implements VectorStore {
       metadata: JSON.stringify(chunk.metadata),
     }));
 
-    const table = this.table as { add: (data: typeof data) => Promise<void> };
+    const table = this.table as { add: (records: Array<Record<string, unknown>>) => Promise<void> };
     await table.add(data);
   }
 

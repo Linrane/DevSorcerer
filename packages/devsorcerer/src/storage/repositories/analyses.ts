@@ -1,5 +1,6 @@
 import { getDb } from '../db.js';
 import { generateId, now } from '../../shared/utils.js';
+import type { RiskCategory, RiskSeverity } from '../../shared/types.js';
 
 export function cacheAnalysisResult(
   sessionId: string,
@@ -31,8 +32,8 @@ export function insertRiskFindings(
   findings: Array<{
     id: string;
     sessionId: string;
-    severity: string;
-    category: string;
+    severity: RiskSeverity;
+    category: RiskCategory;
     ruleId: string;
     filePath: string;
     lineStart?: number;
@@ -71,8 +72,8 @@ export function getRiskFindings(
 ): Array<{
   id: string;
   sessionId: string;
-  severity: string;
-  category: string;
+  severity: RiskSeverity;
+  category: RiskCategory;
   ruleId: string;
   filePath: string;
   lineStart?: number;
@@ -108,8 +109,8 @@ export function getRiskFindings(
   ).map((r) => ({
     id: r.id,
     sessionId: r.session_id,
-    severity: r.severity,
-    category: r.category,
+    severity: r.severity as RiskSeverity,
+    category: r.category as RiskCategory,
     ruleId: r.rule_id,
     filePath: r.file_path,
     lineStart: r.line_start ?? undefined,

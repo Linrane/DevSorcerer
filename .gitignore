@@ -22,6 +22,12 @@ packages/**/*.js
 packages/**/*.js.map
 packages/**/*.d.ts.map
 
+# Keep hand-written JS entry points
+!packages/*/bin/*.js
+
+# Claude local settings
+.claude/settings.local.json
+
 # Temp
 tmp/
 temp/

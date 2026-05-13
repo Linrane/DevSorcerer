@@ -62,30 +62,31 @@ export class DocumentChunker {
     }
 
     const params = event.params as Record<string, unknown> | undefined;
-    const args = params?.arguments || params;
+    const rawArgs = params?.arguments ?? params;
+    const args = rawArgs as Record<string, unknown> | undefined;
 
-    if (args && typeof args === 'object') {
+    if (args) {
       // Extract key fields
-      if (args.content && typeof args.content === 'string') {
+      if (typeof args.content === 'string') {
         parts.push(args.content);
-      } else if (args.code && typeof args.code === 'string') {
+      } else if (typeof args.code === 'string') {
         parts.push(args.code);
-      } else if (args.text && typeof args.text === 'string') {
+      } else if (typeof args.text === 'string') {
         parts.push(args.text);
-      } else if (args.patch && typeof args.patch === 'string') {
+      } else if (typeof args.patch === 'string') {
         parts.push(args.patch);
       }
 
-      if (args.filePath && typeof args.filePath === 'string') {
+      if (typeof args.filePath === 'string') {
         parts.push(`File: ${args.filePath}`);
       }
-      if (args.query && typeof args.query === 'string') {
+      if (typeof args.query === 'string') {
         parts.push(`Query: ${args.query}`);
       }
-      if (args.pattern && typeof args.pattern === 'string') {
+      if (typeof args.pattern === 'string') {
         parts.push(`Pattern: ${args.pattern}`);
       }
-      if (args.command && typeof args.command === 'string') {
+      if (typeof args.command === 'string') {
         // Don't include full shell commands in knowledge to keep it clean
         parts.push(`Executed: ${args.command.slice(0, 200)}`);
       }
@@ -105,12 +106,10 @@ export class DocumentChunker {
 
   private extractFilePath(event: CapturedEvent): string | undefined {
     const params = event.params as Record<string, unknown> | undefined;
-    const args = params?.arguments || params;
-    if (args && typeof args === 'object') {
-      const fp =
-        (args as Record<string, unknown>).filePath ||
-        (args as Record<string, unknown>).path ||
-        (args as Record<string, unknown>).file;
+    const rawArgs = params?.arguments ?? params;
+    const args = rawArgs as Record<string, unknown> | undefined;
+    if (args) {
+      const fp = args.filePath || args.path || args.file;
       return typeof fp === 'string' ? fp : undefined;
     }
     return undefined;

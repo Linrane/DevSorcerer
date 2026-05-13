@@ -85,7 +85,6 @@ export class TransformerEmbedder implements Embedder {
       // Dynamic import to avoid hard dependency
       const { pipeline } = await import('@huggingface/transformers');
       const extractor = await pipeline('feature-extraction', this.modelName, {
-        quantized: true,
         progress_callback: undefined,
       });
       this.model = extractor;
