@@ -1,18 +1,16 @@
 <p align="center">
   <h1 align="center">DevSorcerer / 术士</h1>
   <p align="center">
-    <b>Black Box for Your AI Coding Agents — No CLI Required</b><br>
-    <b>AI 开发的可观测仪表盘 — 无需命令行，打开浏览器就能用</b>
+    <b>Black Box for Your AI Coding Agents</b><br>
+    <b>AI 开发的可观测仪表盘 — 打开浏览器就能用</b>
   </p>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.2.0-purple" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.2.1-purple" alt="Version">
   <img src="https://img.shields.io/badge/node-%3E%3D22-green" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
-  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs Welcome">
   <img src="https://img.shields.io/badge/dashboard-react%2019-61dafb" alt="React 19">
-  <img src="https://img.shields.io/badge/responsive-yes-success" alt="Responsive">
 </p>
 
 <p align="center">
@@ -23,10 +21,8 @@
 
 ---
 
-<p align="center">
-  <i>"Git tells you what changed. DevSorcerer tells you why the AI changed it."</i><br>
-  <i>"Git 告诉你代码改了什么，DevSorcerer 告诉你 AI 为什么这么改。"</i>
-</p>
+> "Git tells you what changed. DevSorcerer tells you why the AI changed it."
+> "Git 告诉你代码改了什么，DevSorcerer 告诉你 AI 为什么这么改。"
 
 ---
 
@@ -34,64 +30,135 @@
 
 ## English
 
-### Why DevSorcerer?
+### Prerequisites
 
-| Pain Point | Without DevSorcerer | With DevSorcerer |
-|---|---|---|
-| "What is the AI doing?" | Black box, no visibility | **Real-time web dashboard**, every tool call visible |
-| "How much is this costing?" | Surprise at end of month | Drill down by **project / session / tool** |
-| "Is the AI writing secure code?" | Manual code review | **8 security rules**, diff-level scanning |
-| "Why does the AI keep failing?" | No idea, repeated failures | **Timeline replay + error loop detection** |
-| "How do I audit this?" | Manual log collection | **One-click export** for SOC2/ISO audits |
-| "How did we fix this last time?" | Forgotten, start over | **Semantic search** across all history |
+Before anything else, verify these two things in your terminal:
+
+```bash
+node --version   # Must be >= 22.0.0
+npm --version    # Comes with Node.js
+```
+
+| If you see | Solution |
+|---|---|
+| `node: command not found` | Install Node.js from https://nodejs.org (choose LTS v22.x) |
+| Node version < 22 | Upgrade: `npm install -g n && n 22`, or reinstall from nodejs.org |
+| `npm: command not found` | npm comes with Node.js — reinstall Node.js (it's included) |
+| **Windows**: `npm` works in Bash but not PowerShell | See [Windows: npm not found in PowerShell](#windows-npm-not-found-in-powershell-or-cmd) |
 
 ### Quick Start
 
-```bash
-npm install -g devsorcerer
-devsorcerer start
-# Open http://localhost:3199 — no CLI needed beyond this!
-```
-
-Open your browser. Everything else is point-and-click.
-
-#### From Source
+Clone, install, build, run. Four commands:
 
 ```bash
+# 1. Get the code
 git clone https://github.com/Linrane/DevSorcerer.git
 cd DevSorcerer
+
+# 2. Install dependencies
 npm install
+
+# 3. Build everything
 npm run build
+
+# 4. Start the dashboard
 node packages/devsorcerer/bin/devsorcerer.js start
-# Open http://localhost:3199
 ```
 
-### Dashboard at a Glance — 9 Pages, Zero Learning Curve
+Open **http://localhost:3199** in your browser. Done.
 
-| Page | What You See |
-|---|---|
-| **Overview** | Live stats, cost trend chart, top tools, "what DevSorcerer tells you" guide |
-| **Sessions** | All sessions with search, desktop table + mobile cards |
-| **Session Detail** | Step-by-step **timeline replay player**, error loop detection, tool breakdown |
-| **Cost Analysis** | Time range filter (7d/30d/90d), per-tool cost table with % bars |
-| **Risk Findings** | Severity breakdown bars, per-finding detail with code snippets |
-| **Quality** | Acceptance rate, rollbacks, AI bugs, radar chart |
-| **Knowledge** | Semantic + keyword hybrid search, context expansion |
-| **Audit** | One-click JSON/CSV/NDJSON export, full or anonymized |
-| **Settings** | Port, DB path, model, toggles with live preview |
+> **Optional**: To use the shorter `devsorcerer` command instead of the full `node packages/...` path:
+> ```bash
+> cd packages/devsorcerer
+> npm link
+> # Now you can run: devsorcerer start
+> ```
 
-### Key Features
+### Troubleshooting / Common Errors
 
-- **Real-time WebSocket** — live event streaming, auto-reconnect with backoff
-- **Timeline Replay Player** — play/pause/speed control, step-by-step with error markers
-- **Responsive Design** — works on desktop, tablet, and mobile (collapsible sidebar)
-- **Skeleton Loading** — smooth loading states everywhere
-- **Error Boundary** — graceful error handling, never white-screens
-- **Bilingual** — all UI text in English, architecture fully intl-ready
+#### `node: command not found`
 
-### MCP Integration (Zero Code Changes)
+You don't have Node.js installed (or it's not in your PATH).
 
-Add to your agent's MCP config — any MCP-compatible agent works:
+- **Windows**: Download the installer from https://nodejs.org (v22 LTS, `.msi` file). Run it. **Important**: check the box "Add to PATH" during installation. Restart your terminal after installing.
+- **Mac**: `brew install node@22` or download from nodejs.org
+- **Linux**: `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs`
+
+Verify with: `node --version`
+
+#### `npm: command not found`
+
+npm is included with Node.js. If Node.js is installed but npm is not found:
+
+- **Windows**: Re-run the Node.js installer and make sure "npm package manager" is checked. Restart terminal.
+- **Mac/Linux**: npm should be in the same directory as node. Check `which node` then verify npm is in the same folder.
+
+#### Windows: npm not found in PowerShell or CMD
+
+This happens when Node.js was installed to a custom path without adding it to the system PATH.
+
+**Fix (pick one):**
+
+Option A — **Use Git Bash** (simplest):
+Install Git for Windows (https://git-scm.com), then use "Git Bash" as your terminal. It shares the same PATH as the bash environment where npm already works.
+
+Option B — **Add to PATH manually** (PowerShell, as Administrator):
+```powershell
+# Find where node.exe is first:
+Get-ChildItem -Path C:\ -Filter node.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 FullName
+
+# Add that directory to your PATH (replace <path> with the actual folder):
+[Environment]::SetEnvironmentVariable('Path', $env:Path + ';<path-to-node-folder>', 'User')
+```
+Close and reopen PowerShell. Run `node --version` to verify.
+
+Option C — **Reinstall Node.js** with the official installer from nodejs.org. Make sure "Add to PATH" is checked.
+
+#### `npm install` fails with `EACCES` (Mac/Linux)
+
+```
+npm install -g npm
+# or configure npm to use a user-owned directory:
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+#### `npm install` hangs or is very slow
+
+```bash
+# Use a mirror (replace with one close to you):
+npm config set registry https://registry.npmmirror.com
+npm install
+```
+
+#### Port 3199 is already in use
+
+```
+Error: listen EADDRINUSE :::3199
+```
+
+```bash
+# Find and kill the process using port 3199:
+# Windows:
+netstat -ano | findstr :3199
+taskkill /PID <PID> /F
+
+# Mac/Linux:
+lsof -i :3199
+kill -9 <PID>
+```
+
+#### `node packages/devsorcerer/bin/devsorcerer.js start` says "No such file"
+
+You're not in the project root directory. Make sure you did `cd DevSorcerer` (the cloned folder) first.
+
+Run `ls` (Mac/Linux) or `dir` (Windows) — you should see `package.json` and a `packages/` folder.
+
+### MCP Integration
+
+Add to your agent's MCP config:
 
 ```json
 {
@@ -104,23 +171,36 @@ Add to your agent's MCP config — any MCP-compatible agent works:
 }
 ```
 
-Compatible: Claude Code, Cursor, Windsurf, Continue, Cline, Codex CLI, and any MCP agent.
+Compatible with: Claude Code, Cursor, Windsurf, Continue, Cline, Codex CLI, and any MCP agent.
 
-### CLI Commands (Advanced Users)
+### CLI Commands
 
 | Command | Description |
 |---|---|
 | `devsorcerer start` | Start server + dashboard |
-| `devsorcerer proxy -t <cmd>` | MCP proxy for agent |
+| `devsorcerer validate` | Pre-flight checks (config, DB, git, Node.js) |
 | `devsorcerer status` | Database stats |
-| `devsorcerer dashboard` | Open dashboard in browser |
-| `devsorcerer analyze cost` | Cost by project/session/tool |
-| `devsorcerer analyze risk` | Security scan with SARIF |
-| `devsorcerer analyze quality` | Acceptance/rollback/bug rate |
-| `devsorcerer show <id>` | Timeline/chain/errors replay |
-| `devsorcerer knowledge search` | Semantic search |
-| `devsorcerer audit export` | Compliance export |
-| `devsorcerer config` | Config management |
+| `devsorcerer analyze cost` | Cost by project / session / tool |
+| `devsorcerer analyze risk` | Security scan (SARIF output) |
+| `devsorcerer analyze quality` | Acceptance / rollback / bug rate |
+| `devsorcerer show <id>` | Session timeline replay |
+| `devsorcerer knowledge search` | Semantic search across history |
+| `devsorcerer audit export` | Compliance export (JSON/CSV/NDJSON) |
+| `devsorcerer config` | Manage configuration |
+
+### Dashboard Pages
+
+| Page | What You See |
+|---|---|
+| **Overview** | Live stats, cost trend, top tools |
+| **Sessions** | All sessions with search |
+| **Session Detail** | Step-by-step timeline replay player |
+| **Cost Analysis** | Time range filter, per-tool cost table |
+| **Risk Findings** | Severity breakdown, per-finding detail |
+| **Quality** | Acceptance rate, rollbacks, AI bugs |
+| **Knowledge** | Semantic + keyword hybrid search |
+| **Audit** | One-click JSON/CSV/NDJSON export |
+| **Settings** | Port, DB path, model, toggles |
 
 ### Architecture
 
@@ -130,60 +210,31 @@ AI Agent (Claude Code, Cursor, etc.)
        ▼
 ┌──────────────────┐
 │  MCP Proxy       │  ← Transparent interception
-│  ┌────────────┐  │
-│  │ Capture    │──┼──→ SQLite (events, sessions, analysis)
-│  │ Forward    │  │
-│  │ Enrich     │  │
-│  └────────────┘  │
+│  Capture/Forward │──→ SQLite (events, sessions, analysis)
 └──────┬───────────┘
        │ JSON-RPC (unchanged)
        ▼
   MCP Server
 
-Analysis Layer:
-  Cost Analyzer        → Token/cost per project, session, tool
-  Risk Analyzer        → 8 security rules, regex + AST scanning
-  Quality Analyzer     → Acceptance / rollback / bug rate from git blame
-  Bottleneck Analyzer  → Error loop detection, slow tool ranking
-  Knowledge Engine     → Embeddings + LanceDB + hybrid search
-
-Web Dashboard (React 19 + Vite + Recharts + Tailwind 4):
-  Overview → Sessions → Session Detail (replay player) →
-  Cost → Risk → Quality → Knowledge → Audit → Settings
-  All responsive, all real-time via WebSocket.
+Analysis: Cost → Risk (8 rules) → Quality → Bottleneck → Knowledge (embeddings + LanceDB)
+Dashboard: React 19 + Vite + Recharts + Tailwind 4, 9 pages, real-time via WebSocket
 ```
-
-### What's New in v0.2.0
-
-- **Visual-First Dashboard** — redesigned all 9 pages for non-technical users
-- **Timeline Replay Player** — play/pause/speed control for session time travel
-- **Real-time WebSocket** — live event streaming replaces polling
-- **Responsive Design** — mobile sidebar, responsive tables, works on any device
-- **Loading Skeletons** — smooth loading everywhere, no more "Loading..." text
-- **Error Boundary** — proper error handling, never a blank screen
-- **SPA Fallback** — server serves dashboard static files, single `devsorcerer start` does it all
-- **Bug Fixes**: CostAnalysis all-sessions mode, AuditExport project dropdown, Settings toggle CSS, Risk severity bars, Overview total cost accuracy
-- **12+ UI/UX improvements**: breadcrumbs, tooltips, empty states, context expansion, search highlighting
 
 ### Key Differentiators
 
 | Dimension | Other Tools | DevSorcerer |
 |---|---|---|
 | Event capture | Per-agent SDK | **Universal MCP proxy** |
-| Cost analysis | Basic token count | **Tool-level attribution** |
-| Security | Separate SAST tool | **Built-in diff scanning** |
-| Compliance | Manual log export | **One-click export** |
+| UX | CLI-first | **Dashboard-first** |
 | Knowledge | Lost after session | **Vector semantic search** |
-| **UX** | **CLI-first** | **Dashboard-first, zero CLI** |
-| Privacy | Cloud upload | **Local-first + anonymization** |
-| **Mobile** | **Desktop only** | **Responsive, any device** |
+| Privacy | Cloud upload | **Local-first** |
+| Mobile | Desktop only | **Responsive, any device** |
 
 ### Privacy
 
 - **Local-first**: All data in SQLite + LanceDB on your machine
-- **Differential privacy**: `audit export --scope anonymized` strips identifiers
+- **Anonymization**: `audit export --scope anonymized`
 - **No cloud upload**: Code never leaves your filesystem
-- **Configurable**: `devsorcerer config set captureEnabled false`
 
 ---
 
@@ -191,64 +242,150 @@ Web Dashboard (React 19 + Vite + Recharts + Tailwind 4):
 
 ## 中文
 
-### 为什么需要 DevSorcerer？
+### 前置条件
 
-| 痛点 | 没有它 | 有了它 |
-|---|---|---|
-| "AI 在干什么？" | 黑盒，完全不知道 | **实时网页仪表盘**，每个工具调用都可见 |
-| "花了多少钱？" | 月底看账单吓一跳 | 按项目/会话/工具**逐级下钻**，随时掌控 |
-| "AI 写的代码安全吗？" | 手动 Code Review | **8 条安全规则自动扫描**，diff 级别检测 |
-| "AI 为什么老是做错？" | 不知道，重复失败 | **时间线回放 + 错误循环检测**，一眼找到根因 |
-| "怎么合规审计？" | 手工整理日志 | **一键导出** SOC2/ISO 审计报告 |
-| "上次怎么解决的？" | 忘了，重头再来 | **语义搜索**，跨所有历史会话查找 |
+在开始之前，先在终端里验证两件事：
+
+```bash
+node --version   # 必须 >= 22.0.0
+npm --version    # 随 Node.js 一起安装
+```
+
+| 如果你看到 | 解决方法 |
+|---|---|
+| `node: command not found` | 从 https://nodejs.org 安装 Node.js（选 LTS v22.x 版本） |
+| Node 版本 < 22 | 升级：`npm install -g n && n 22`，或从 nodejs.org 重装 |
+| `npm: command not found` | npm 随 Node.js 一起提供 — 重装 Node.js 即可 |
+| **Windows**：Bash 里能用 npm，PowerShell 里不行 | 见下方 [Windows：PowerShell 找不到 npm](#windowspowershell-找不到-npm-或-cmd) |
 
 ### 快速开始
 
-```bash
-npm install -g devsorcerer
-devsorcerer start
-# 打开 http://localhost:3199 即可使用
-```
-
-打开浏览器即可使用，无需再碰命令行。
-
-#### 从源码构建
+克隆、安装、构建、运行。四步搞定：
 
 ```bash
+# 1. 下载代码
 git clone https://github.com/Linrane/DevSorcerer.git
 cd DevSorcerer
+
+# 2. 安装依赖
 npm install
+
+# 3. 构建项目
 npm run build
+
+# 4. 启动仪表盘
 node packages/devsorcerer/bin/devsorcerer.js start
-# 打开 http://localhost:3199
 ```
 
-### 仪表盘一览 — 9 个页面，零学习成本
+浏览器打开 **http://localhost:3199**。不用再碰命令行了。
 
-| 页面 | 你能看到 |
-|---|---|
-| **总览** | 实时统计、成本趋势图、热门工具、"DevSorcerer 告诉你什么"指南 |
-| **会话列表** | 全部会话，支持搜索，桌面端表格 + 移动端卡片 |
-| **会话详情** | 逐步**时间线回放播放器**、错误循环检测、工具分类统计 |
-| **成本分析** | 时间范围筛选（7天/30天/90天），按工具成本表格及占比条 |
-| **风险扫描** | 严重程度分布条、每条风险详情及代码片段 |
-| **质量** | 采纳率、回滚次数、AI 缺陷、雷达图 |
-| **知识搜索** | 语义 + 关键词混合搜索，上下文展开 |
-| **审计导出** | 一键 JSON/CSV/NDJSON 导出，完整或匿名 |
-| **设置** | 端口、数据库路径、模型、开关实时预览 |
+> **可选**：把 `devsorcerer` 注册为全局命令，以后在任意目录都能直接敲：
+> ```bash
+> cd packages/devsorcerer
+> npm link
+> # 之后直接运行：devsorcerer start
+> ```
 
-### 核心特性
+### 常见报错与解决方法
 
-- **实时 WebSocket** — 实时事件流推送，断线自动重连（指数退避）
-- **时间线回放播放器** — 播放/暂停/速度控制，逐步回放带错误标记
-- **响应式设计** — 桌面端、平板、手机均可使用（可折叠侧边栏）
-- **骨架屏加载** — 各处流畅的加载状态
-- **错误边界** — 优雅的错误处理，永不会白屏
-- **双语架构** — 所有 UI 文本为英文，架构完全支持国际化
+#### `node: command not found`（找不到 node 命令）
 
-### MCP 集成（零代码改动）
+你的电脑没有安装 Node.js，或者装了但没加到 PATH。
 
-将以下配置添加到你的 agent 的 MCP 配置中——任何 MCP 兼容的 agent 均可使用：
+- **Windows**：去 https://nodejs.org 下载 v22 LTS 版本（`.msi` 安装包）。安装时**一定要勾选** "Add to PATH" 选项。装完重启终端。
+- **Mac**：终端执行 `brew install node@22`，或者去 nodejs.org 下载安装包
+- **Linux**：`curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs`
+
+验证：`node --version`
+
+#### `npm: command not found`（找不到 npm 命令）
+
+npm 是 Node.js 自带的。如果 node 装好了但 npm 没有：
+
+- **Windows**：重新运行 Node.js 安装程序，确保勾选 "npm package manager"。重启终端。
+- **Mac/Linux**：npm 和 node 在同一个目录。用 `which node` 找到位置，确认 npm 也在同一文件夹。
+
+#### Windows：PowerShell 找不到 npm（或 CMD）
+
+这种情况是 Node.js 装到了自定义路径，但没有写入系统 PATH。
+
+**解决方法（任选一个）：**
+
+方案 A — **用 Git Bash**（最简单）：
+安装 Git for Windows（https://git-scm.com），然后用 "Git Bash" 作为终端。在 Git Bash 里 npm 和 node 都能直接使用。
+
+方案 B — **手动添加 PATH**（在管理员 PowerShell 里执行）：
+```powershell
+# 先找到 node.exe 在哪：
+Get-ChildItem -Path C:\ -Filter node.exe -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 FullName
+
+# 把那个目录加到 PATH（把 <path> 换成上面找到的目录）：
+[Environment]::SetEnvironmentVariable('Path', $env:Path + ';<node所在目录的路径>', 'User')
+```
+关掉重新打开 PowerShell。输入 `node --version` 验证。
+
+方案 C — **重装 Node.js**：从 nodejs.org 下载官方安装程序，安装时确保勾选 "Add to PATH"。
+
+#### `npm install` 报 `EACCES` 错误（Mac/Linux）
+
+权限不够。两种修法：
+
+```bash
+# 方法1：用管理员权限
+sudo npm install
+
+# 方法2：配置 npm 使用用户目录（推荐）
+mkdir ~/.npm-global
+npm config set prefix '~/.npm-global'
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+#### `npm install` 很慢或卡住
+
+```bash
+# 换成国内镜像（例如 npmmirror）：
+npm config set registry https://registry.npmmirror.com
+npm install
+```
+
+#### 端口 3199 被占用
+
+```
+Error: listen EADDRINUSE :::3199
+```
+
+说明之前启动的 DevSorcerer 还没关，或者有其他程序占用了 3199 端口。
+
+```bash
+# Windows：
+netstat -ano | findstr :3199
+taskkill /PID <进程ID> /F
+
+# Mac/Linux：
+lsof -i :3199
+kill -9 <进程ID>
+```
+
+#### 运行 `node packages/devsorcerer/bin/devsorcerer.js start` 提示文件不存在
+
+你不在项目根目录。确保你先 `cd DevSorcerer`（进入克隆下来的文件夹）。用 `ls`（Mac/Linux）或 `dir`（Windows）应该能看到 `package.json` 和 `packages/` 文件夹。
+
+#### 启动后数据库报错
+
+如果看到类似 `Database not initialized` 的提示：
+
+```bash
+# 先运行一次 validate 检查各项配置是否正常
+devsorcerer validate
+
+# 然后重新启动
+devsorcerer start
+```
+
+### MCP 集成
+
+把以下配置加到你的 AI agent 的 MCP 配置中：
 
 ```json
 {
@@ -261,86 +398,70 @@ node packages/devsorcerer/bin/devsorcerer.js start
 }
 ```
 
-兼容：Claude Code、Cursor、Windsurf、Continue、Cline、Codex CLI 及任何 MCP agent。
+兼容：Claude Code、Cursor、Windsurf、Continue、Cline、Codex CLI 等所有 MCP agent。
 
-### 命令行（高级用户）
+### CLI 命令一览
 
 | 命令 | 说明 |
 |---|---|
 | `devsorcerer start` | 启动服务 + 仪表盘 |
-| `devsorcerer proxy -t <cmd>` | MCP 代理模式 |
+| `devsorcerer validate` | 预检（配置、数据库、git、Node.js 版本） |
 | `devsorcerer status` | 数据库统计 |
-| `devsorcerer dashboard` | 在浏览器中打开仪表盘 |
 | `devsorcerer analyze cost` | 按项目/会话/工具分析成本 |
-| `devsorcerer analyze risk` | 安全漏洞扫描（SARIF 格式） |
-| `devsorcerer analyze quality` | 采纳率/回滚率/缺陷率分析 |
-| `devsorcerer show <id>` | 时间线/调用链/错误回放 |
-| `devsorcerer knowledge search` | 语义搜索 |
-| `devsorcerer audit export` | 合规导出 |
+| `devsorcerer analyze risk` | 安全扫描（可输出 SARIF 格式） |
+| `devsorcerer analyze quality` | 采纳率/回滚率/缺陷率 |
+| `devsorcerer show <id>` | 会话时间线回放 |
+| `devsorcerer knowledge search` | 跨会话语义搜索 |
+| `devsorcerer audit export` | 审计导出（JSON/CSV/NDJSON） |
 | `devsorcerer config` | 配置管理 |
+
+### 仪表盘页面
+
+| 页面 | 你能看到 |
+|---|---|
+| **总览** | 实时统计、成本趋势图、热门工具排行 |
+| **会话列表** | 全部会话，支持搜索 |
+| **会话详情** | 逐步时间线回放播放器 |
+| **成本分析** | 按时间筛，工具级成本明细 |
+| **风险扫描** | 严重程度分布，每条风险详情 |
+| **质量** | 采纳率、回滚次数、AI 缺陷 |
+| **知识搜索** | 语义 + 关键词混合搜索 |
+| **审计导出** | 一键 JSON/CSV/NDJSON 导出 |
+| **设置** | 端口、数据库、模型、开关 |
 
 ### 架构
 
 ```
-AI Agent (Claude Code, Cursor 等)
+AI Agent（Claude Code、Cursor 等）
        │ JSON-RPC 2.0
        ▼
-┌──────────────────┐
-│  MCP Proxy       │  ← 透明拦截
-│  ┌────────────┐  │
-│  │ 捕获       │──┼──→ SQLite (事件、会话、分析)
-│  │ 转发       │  │
-│  │ 增强       │  │
-│  └────────────┘  │
-└──────┬───────────┘
-       │ JSON-RPC (不变)
-       ▼
+┌─────────────────┐
+│  MCP Proxy      │  ← 透明拦截，不改协议
+│  捕获 / 转发    │──→ SQLite（事件、会话、分析）
+└─────┬───────────┘
+      │ JSON-RPC（不变）
+      ▼
   MCP Server
 
-分析层:
-  成本分析器    → 按项目/会话/工具的 Token/成本
-  风险分析器    → 8 条安全规则，正则 + AST 扫描
-  质量分析器    → 采纳率/回滚率/缺陷率（基于 git blame）
-  瓶颈分析器    → 错误循环检测、慢工具排序
-  知识引擎      → 嵌入向量 + LanceDB + 混合搜索
-
-Web 仪表盘 (React 19 + Vite + Recharts + Tailwind 4):
-  总览 → 会话 → 会话详情（回放播放器）→
-  成本 → 风险 → 质量 → 知识 → 审计 → 设置
-  全响应式、全实时 WebSocket 推送。
+分析层：成本 → 风险（8规则）→ 质量 → 瓶颈 → 知识（向量 + LanceDB）
+仪表盘：React 19 + Vite + Recharts + Tailwind 4，9 页面，WebSocket 实时推送
 ```
-
-### v0.2.0 更新内容
-
-- **可视化优先仪表盘** — 为非技术用户重新设计了全部 9 个页面
-- **时间线回放播放器** — 播放/暂停/速度控制，会话时间旅行
-- **实时 WebSocket** — 实时事件流替代轮询
-- **响应式设计** — 移动端侧边栏、响应式表格，任何设备都能用
-- **骨架屏加载** — 各处流畅加载，告别"Loading..."文字
-- **错误边界** — 完善的错误处理，永不会出现空白页
-- **SPA 回退** — 服务端直接托管仪表盘静态文件，一条 `devsorcerer start` 搞定
-- **Bug 修复**：成本分析全会话模式、审计导出项目下拉框、设置开关 CSS、风险严重程度条、总览总成本准确性
-- **12+ UI/UX 改进**：面包屑、提示框、空状态、上下文展开、搜索高亮
 
 ### 核心差异化
 
 | 维度 | 其他工具 | DevSorcerer |
 |---|---|---|
 | 事件捕获 | 每种 agent 单独 SDK | **通用 MCP 代理** |
-| 成本分析 | 基础 Token 计数 | **工具级归因** |
-| 安全 | 单独的 SAST 工具 | **内置 diff 扫描** |
-| 合规 | 手动导出日志 | **一键导出** |
-| 知识 | 会话结束后丢失 | **向量语义搜索** |
-| **用户体验** | **命令行优先** | **仪表盘优先，零 CLI** |
-| 隐私 | 上传到云端 | **本地优先 + 匿名化** |
-| **移动端** | **仅桌面端** | **响应式，任何设备** |
+| 用户体验 | 命令行优先 | **仪表盘优先，打开就能用** |
+| 知识 | 会话结束就丢了 | **向量语义搜索** |
+| 隐私 | 上传到云端 | **本地优先** |
+| 移动端 | 仅桌面 | **响应式，手机也能看** |
 
 ### 隐私
 
-- **本地优先**：所有数据存储在本地 SQLite + LanceDB
-- **差分隐私**：`audit export --scope anonymized` 去除标识符
-- **无云端上传**：代码不会离开你的文件系统
-- **可配置**：`devsorcerer config set captureEnabled false`
+- **本地优先**：所有数据存在你的 SQLite + LanceDB 里
+- **可匿名**：`audit export --scope anonymized`
+- **不上传**：代码和日志不离开你的电脑
 
 ---
 
@@ -355,16 +476,17 @@ DevTwin/
 │   │       ├── collector/    # MCP transparent proxy
 │   │       ├── analyzer/     # Cost / Risk / Quality / Bottleneck
 │   │       ├── knowledge/    # Embeddings + semantic search
-│   │       ├── server/       # Fastify API + WebSocket + static
+│   │       ├── server/       # Fastify API + WebSocket
 │   │       ├── storage/      # SQLite + repositories
-│   │       └── cli/          # Clipanion commands
+│   │       ├── cli/          # Clipanion commands
+│   │       └── shared/       # Types, utils, validation
 │   └── dashboard/            # React 19 + Vite Web UI
 │       └── src/
 │           ├── pages/        # 9 pages (Overview → Settings)
 │           ├── components/   # Charts, Session, Layout, UI
 │           ├── hooks/        # useWebSocket
 │           └── api/          # TanStack Query client
-└── scripts/install.sh        # curl | sh installer
+└── scripts/install.sh        # Unix installer
 ```
 
 ## License / 许可证
