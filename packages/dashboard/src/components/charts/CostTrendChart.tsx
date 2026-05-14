@@ -11,8 +11,10 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
+import { useT } from '../../i18n';
 
 export function CostTrendChart() {
+  const { t } = useT();
   const { data } = useQuery({
     queryKey: ['sessions', 'cost-trend'],
     queryFn: () => getSessions({ limit: 100 }),
@@ -41,7 +43,7 @@ export function CostTrendChart() {
   if (chartData.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-gray-600 text-sm">
-        No session data yet. Start capturing events to see trends.
+        {t('No session data yet. Start capturing events to see trends.')}
       </div>
     );
   }
@@ -65,7 +67,7 @@ export function CostTrendChart() {
             borderRadius: '8px',
             fontSize: '12px',
           }}
-          formatter={(value: number) => [`$${value.toFixed(4)}`, 'Cost']}
+          formatter={(value: number) => [`$${value.toFixed(4)}`, t('Cost')]}
         />
         <Area
           type="monotone"

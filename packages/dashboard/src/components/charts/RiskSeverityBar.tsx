@@ -10,8 +10,10 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { useT } from '../../i18n';
 
 export function RiskSeverityBar() {
+  const { t } = useT();
   const { data } = useQuery({
     queryKey: ['risk', 'severity-bar'],
     queryFn: () => getRiskAnalysis({ project_id: '' }),
@@ -27,10 +29,10 @@ export function RiskSeverityBar() {
   };
 
   const chartData = [
-    { name: 'Critical', value: severityCounts.critical, fill: '#ef4444' },
-    { name: 'High', value: severityCounts.high, fill: '#f97316' },
-    { name: 'Medium', value: severityCounts.medium, fill: '#eab308' },
-    { name: 'Low', value: severityCounts.low, fill: '#3b82f6' },
+    { name: t('CRITICAL'), value: severityCounts.critical, fill: '#ef4444' },
+    { name: t('HIGH'), value: severityCounts.high, fill: '#f97316' },
+    { name: t('MEDIUM'), value: severityCounts.medium, fill: '#eab308' },
+    { name: t('LOW'), value: severityCounts.low, fill: '#3b82f6' },
   ];
 
   const total = findings.length;
@@ -38,7 +40,7 @@ export function RiskSeverityBar() {
   if (total === 0) {
     return (
       <div className="h-48 flex items-center justify-center text-gray-600 text-sm">
-        No risk findings yet. Run risk analysis on sessions to see results.
+        {t('No risk findings yet. Run risk analysis on sessions to see results.')}
       </div>
     );
   }

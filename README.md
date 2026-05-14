@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.2.1-purple" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.2.2-purple" alt="Version">
   <img src="https://img.shields.io/badge/node-%3E%3D22-green" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/dashboard-react%2019-61dafb" alt="React 19">

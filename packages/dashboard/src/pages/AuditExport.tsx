@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getSessions, exportAudit } from '../api/client';
 import { FileText, Download, ShieldCheck } from 'lucide-react';
+import { useT } from '../i18n';
 
 export function AuditExport() {
+  const { t } = useT();
   const [format, setFormat] = useState<'json' | 'csv' | 'ndjson'>('json');
   const [scope, setScope] = useState<'full' | 'anonymized'>('full');
   const [projectId, setProjectId] = useState('');
@@ -45,17 +47,16 @@ export function AuditExport() {
   return (
     <div className="space-y-6 max-w-2xl">
       <h2 className="text-xl font-semibold flex items-center gap-2">
-        <ShieldCheck size={24} /> Audit Export
+        <ShieldCheck size={24} /> {t('Audit Export')}
       </h2>
       <p className="text-sm text-gray-500">
-        Export timestamped agent event logs for SOC2/ISO compliance audits.
-        Supports CSV, JSON, and NDJSON formats with optional anonymization.
+        {t('Export timestamped agent event logs for SOC2/ISO compliance audits. Supports CSV, JSON, and NDJSON formats with optional anonymization.')}
       </p>
 
       <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-5">
         {/* Format */}
         <div>
-          <label className="text-sm text-gray-400 block mb-2">Export Format</label>
+          <label className="text-sm text-gray-400 block mb-2">{t('Export Format')}</label>
           <div className="flex gap-2">
             {(['json', 'csv', 'ndjson'] as const).map((f) => (
               <button
@@ -75,7 +76,7 @@ export function AuditExport() {
 
         {/* Scope */}
         <div>
-          <label className="text-sm text-gray-400 block mb-2">Data Scope</label>
+          <label className="text-sm text-gray-400 block mb-2">{t('Data Scope')}</label>
           <div className="flex gap-2">
             <button
               onClick={() => setScope('full')}
@@ -85,7 +86,7 @@ export function AuditExport() {
                   : 'bg-gray-800 text-gray-400 border border-gray-700'
               }`}
             >
-              Full (includes file paths, project names)
+              {t('Full (includes file paths, project names)')}
             </button>
             <button
               onClick={() => setScope('anonymized')}
@@ -95,7 +96,7 @@ export function AuditExport() {
                   : 'bg-gray-800 text-gray-400 border border-gray-700'
               }`}
             >
-              Anonymized (strips identifiers)
+              {t('Anonymized (strips identifiers)')}
             </button>
           </div>
         </div>
@@ -103,14 +104,14 @@ export function AuditExport() {
         {/* Project Filter */}
         <div>
           <label className="text-sm text-gray-400 block mb-2">
-            Project Filter (optional)
+            {t('Project Filter (optional)')}
           </label>
           <select
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200"
           >
-            <option value="">All Projects</option>
+            <option value="">{t('All Projects')}</option>
             {projects.map((p) => (
               <option key={p} value={p}>{p}</option>
             ))}
@@ -124,12 +125,11 @@ export function AuditExport() {
           className="w-full py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:text-gray-500 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
         >
           <Download size={18} />
-          {exporting ? 'Exporting...' : 'Export Audit Log'}
+          {exporting ? t('Exporting...') : t('Export Audit Log')}
         </button>
 
         <p className="text-xs text-gray-600 text-center">
-          Audit logs include timestamps, agent identity, tool calls, and event sequences.
-          Raw code content is excluded in anonymized exports.
+          {t('Audit logs include timestamps, agent identity, tool calls, and event sequences. Raw code content is excluded in anonymized exports.')}
         </p>
       </div>
     </div>

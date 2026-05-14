@@ -15,7 +15,7 @@ import('../dist/cli/root.js').then(async ({ RootCommand }) => {
   const cli = new Cli({
     binaryLabel: 'DevSorcerer',
     binaryName: 'devsorcerer',
-    binaryVersion: '0.2.0',
+    binaryVersion: '0.2.2',
   });
 
   cli.register(RootCommand);

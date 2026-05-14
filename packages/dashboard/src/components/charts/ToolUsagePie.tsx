@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
+import { useT } from '../../i18n';
 
 const COLORS = [
   '#8b5cf6', '#3b82f6', '#22c55e', '#eab308',
@@ -15,6 +16,7 @@ const COLORS = [
 ];
 
 export function ToolUsagePie() {
+  const { t } = useT();
   const { data } = useQuery({
     queryKey: ['cost', 'tool-pie'],
     queryFn: () => getCostAnalysis({ project_id: 'all' }),
@@ -33,7 +35,7 @@ export function ToolUsagePie() {
   if (pieData.length === 0) {
     return (
       <div className="h-64 flex items-center justify-center text-gray-600 text-sm">
-        No tool usage data yet.
+        {t('No tool usage data yet.')}
       </div>
     );
   }
@@ -65,7 +67,7 @@ export function ToolUsagePie() {
             borderRadius: '8px',
             fontSize: '12px',
           }}
-          formatter={(value: number) => [`$${value.toFixed(4)}`, 'Cost']}
+          formatter={(value: number) => [`$${value.toFixed(4)}`, t('Cost')]}
         />
         <Legend
           wrapperStyle={{ fontSize: '11px', color: '#9ca3af' }}

@@ -8,8 +8,10 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from 'recharts';
+import { useT } from '../../i18n';
 
 export function QualityTimelineChart() {
+  const { t } = useT();
   const { data } = useQuery({
     queryKey: ['quality', 'radar'],
     queryFn: () => getQualityAnalysis({ project_id: '' }),
@@ -19,22 +21,22 @@ export function QualityTimelineChart() {
 
   const chartData = q
     ? [
-        { subject: 'Acceptance', value: q.acceptanceRate, fullMark: 100 },
+        { subject: t('Acceptance'), value: q.acceptanceRate, fullMark: 100 },
         {
-          subject: 'Low Rollback',
+          subject: t('Low Rollback'),
           value: Math.max(0, 100 - ((q.rollbackCount ?? 0) * 20)),
           fullMark: 100,
         },
-        { subject: 'Low Bugs', value: q.bugCount ? Math.max(0, 100 - q.bugCount * 10) : 100, fullMark: 100 },
-        { subject: 'Created', value: Math.min(100, (q.filesCreated ?? 0) * 10), fullMark: 100 },
-        { subject: 'Modified', value: Math.min(100, (q.filesModified ?? 0) * 10), fullMark: 100 },
+        { subject: t('Low Bugs'), value: q.bugCount ? Math.max(0, 100 - q.bugCount * 10) : 100, fullMark: 100 },
+        { subject: t('Created'), value: Math.min(100, (q.filesCreated ?? 0) * 10), fullMark: 100 },
+        { subject: t('Modified'), value: Math.min(100, (q.filesModified ?? 0) * 10), fullMark: 100 },
       ]
     : [];
 
   if (!q) {
     return (
       <div className="h-64 flex items-center justify-center text-gray-600 text-sm">
-        No quality data yet.
+        {t('No quality data yet.')}
       </div>
     );
   }
@@ -46,7 +48,7 @@ export function QualityTimelineChart() {
         <PolarAngleAxis dataKey="subject" stroke="#4b5563" fontSize={11} />
         <PolarRadiusAxis stroke="#4b5563" fontSize={10} />
         <Radar
-          name="Quality"
+          name={t('Quality')}
           dataKey="value"
           stroke="#8b5cf6"
           fill="#8b5cf6"

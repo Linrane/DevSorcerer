@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { searchKnowledge } from '../api/client';
 import { Search, Clock, FileCode, Hash, Sparkles } from 'lucide-react';
 import type { SearchResult } from '../api/client';
+import { useT } from '../i18n';
 
 export function Knowledge() {
+  const { t } = useT();
   const [query, setQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [hybrid, setHybrid] = useState(true);
@@ -23,10 +25,10 @@ export function Knowledge() {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold flex items-center gap-2">
-        <Sparkles size={22} /> Knowledge Search
+        <Sparkles size={22} /> {t('Knowledge Search')}
       </h2>
       <p className="text-sm text-gray-500">
-        Semantic search across all historical AI sessions. Find how similar problems were solved, what patterns worked, and reuse past solutions.
+        {t('Semantic search across all historical AI sessions. Find how similar problems were solved, what patterns worked, and reuse past solutions.')}
       </p>
 
       <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
@@ -39,7 +41,7 @@ export function Knowledge() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder='Search patterns, e.g. "concurrent lock" or "OAuth implementation"...'
+            placeholder={t('Search patterns, e.g. "concurrent lock" or "OAuth implementation"...')}
             className="w-full pl-12 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-gray-200 placeholder-gray-600 focus:outline-none focus:border-purple-500 text-sm"
           />
         </div>
@@ -48,7 +50,7 @@ export function Knowledge() {
             type="submit"
             className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl text-sm font-medium transition-colors flex-shrink-0"
           >
-            Search
+            {t('Search')}
           </button>
           <button
             type="button"
@@ -58,9 +60,9 @@ export function Knowledge() {
                 ? 'bg-purple-600/20 border-purple-500/50 text-purple-300'
                 : 'bg-gray-900 border-gray-700 text-gray-500 hover:border-gray-600'
             }`}
-            title="Hybrid = vector similarity + keyword matching"
+            title={t('Hybrid = vector similarity + keyword matching')}
           >
-            Hybrid
+            {t('Hybrid')}
           </button>
         </div>
       </form>
@@ -76,14 +78,14 @@ export function Knowledge() {
 
       {isError && (
         <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
-          Search failed: {error instanceof Error ? error.message : 'Unknown error'}
+          {t('Search failed:')} {error instanceof Error ? error.message : t('Unknown error')}
         </div>
       )}
 
       {data && (
         <div>
           <p className="text-sm text-gray-500 mb-4">
-            {data.results.length} result{data.results.length !== 1 ? 's' : ''} in {data.tookMs}ms
+            {data.results.length} {data.results.length !== 1 ? t('results') : t('result')} in {data.tookMs}ms
           </p>
           <div className="space-y-4">
             {data.results.map((result: SearchResult, i: number) => (
@@ -96,17 +98,17 @@ export function Knowledge() {
       {data?.results.length === 0 && searchQuery && (
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center text-gray-500">
           <Search size={48} className="mx-auto mb-3 text-gray-700" />
-          <p>No results found for "{searchQuery}"</p>
-          <p className="text-sm mt-1">Try different keywords, a broader query, or toggle Hybrid search off.</p>
+          <p>{t('No results found for')} "{searchQuery}"</p>
+          <p className="text-sm mt-1">{t('Try different keywords, a broader query, or toggle Hybrid search off.')}</p>
         </div>
       )}
 
       {!searchQuery && (
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center text-gray-500">
           <Sparkles size={48} className="mx-auto mb-3 text-gray-700" />
-          <p>Enter a query to search across all AI sessions</p>
+          <p>{t('Enter a query to search across all AI sessions')}</p>
           <p className="text-sm mt-1 max-w-md mx-auto">
-            The knowledge engine uses AI embeddings to find semantically similar solutions, even when keywords don't match exactly.
+            {t("The knowledge engine uses AI embeddings to find semantically similar solutions, even when keywords don't match exactly.")}
           </p>
         </div>
       )}
@@ -115,9 +117,10 @@ export function Knowledge() {
 }
 
 function ResultCard({ result, index }: { result: SearchResult; index: number }) {
+  const { t } = useT();
   const date = result.chunk.metadata.timestamp
     ? new Date(result.chunk.metadata.timestamp).toLocaleString()
-    : 'Unknown date';
+    : t('Unknown date');
 
   return (
     <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 hover:border-gray-700 transition-colors">
@@ -126,7 +129,7 @@ function ResultCard({ result, index }: { result: SearchResult; index: number }) 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="px-2 py-0.5 text-xs rounded bg-purple-500/10 text-purple-400">
-              {result.chunk.toolName || 'unknown'}
+              {result.chunk.toolName || t('unknown')}
             </span>
             <span className="text-xs text-gray-600 flex items-center gap-1">
               <Hash size={12} />
@@ -137,7 +140,7 @@ function ResultCard({ result, index }: { result: SearchResult; index: number }) 
               {date}
             </span>
             <span className="text-xs text-gray-700 font-mono">
-              {(result.score * 100).toFixed(1)}% match
+              {(result.score * 100).toFixed(1)}% {t('match')}
             </span>
           </div>
           <p className="text-gray-300 text-sm line-clamp-3">{result.chunk.text}</p>
@@ -150,7 +153,7 @@ function ResultCard({ result, index }: { result: SearchResult; index: number }) 
           {result.contextBefore && (
             <details className="mt-2">
               <summary className="text-xs text-gray-600 cursor-pointer hover:text-gray-400">
-                Show context
+                {t('Show context')}
               </summary>
               <p className="mt-1 text-xs text-gray-500 bg-gray-800/50 rounded p-2 italic">
                 {result.contextBefore}

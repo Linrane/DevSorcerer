@@ -10,8 +10,10 @@ import {
   TrendingUp,
   ArrowRight,
 } from 'lucide-react';
+import { useT } from '../i18n';
 
 export function Overview() {
+  const { t } = useT();
   const { data: status } = useQuery({
     queryKey: ['status'],
     queryFn: getStatus,
@@ -32,28 +34,28 @@ export function Overview() {
 
   const statCards = [
     {
-      label: 'Total Sessions',
+      label: t('Total Sessions'),
       value: (status?.database.sessions || 0).toLocaleString(),
       icon: Activity,
       color: 'text-blue-400',
       bg: 'bg-blue-500/10',
     },
     {
-      label: 'Total Cost',
+      label: t('Total Cost'),
       value: `$${totalCost.toFixed(4)}`,
       icon: DollarSign,
       color: 'text-green-400',
       bg: 'bg-green-500/10',
     },
     {
-      label: 'Total Tokens',
+      label: t('Total Tokens'),
       value: totalTokens >= 1000 ? `${(totalTokens / 1000).toFixed(0)}K` : totalTokens.toLocaleString(),
       icon: Layers,
       color: 'text-yellow-400',
       bg: 'bg-yellow-500/10',
     },
     {
-      label: 'Projects',
+      label: t('Projects'),
       value: (status?.database.projects || 0).toLocaleString(),
       icon: TrendingUp,
       color: 'text-purple-400',
@@ -64,10 +66,10 @@ export function Overview() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Overview</h2>
+        <h2 className="text-xl font-semibold">{t('Overview')}</h2>
         <span className="text-xs text-gray-600 flex items-center gap-1.5">
           <span className="inline-block w-2 h-2 bg-green-500 rounded-full live-dot" />
-          Live
+          {t('Live')}
         </span>
       </div>
 
@@ -92,11 +94,11 @@ export function Overview() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-          <h3 className="text-sm font-medium text-gray-400 mb-4">Cost Trend</h3>
+          <h3 className="text-sm font-medium text-gray-400 mb-4">{t('Cost Trend')}</h3>
           <CostTrendChart />
         </div>
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-          <h3 className="text-sm font-medium text-gray-400 mb-4">Top Tools by Usage</h3>
+          <h3 className="text-sm font-medium text-gray-400 mb-4">{t('Top Tools by Usage')}</h3>
           <ToolUsagePie />
         </div>
       </div>
@@ -105,13 +107,13 @@ export function Overview() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Why DevSorcerer? */}
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-          <h3 className="text-sm font-medium text-gray-400 mb-4">What DevSorcerer Tells You</h3>
+          <h3 className="text-sm font-medium text-gray-400 mb-4">{t('What DevSorcerer Tells You')}</h3>
           <div className="space-y-3">
             {[
-              { q: 'Why did this AI task cost so much?', a: 'Token cost per tool call, by project and date.' },
-              { q: 'Is AI-generated code secure?', a: 'Scans every diff for secrets, injection, unsafe patterns.' },
-              { q: 'Why does AI keep failing?', a: 'Replays thinking chain, highlights error loops.' },
-              { q: 'What\'s the ROI of AI coding?', a: 'Acceptance rate, rollback rate, AI bug rate.' },
+              { q: t('Why did this AI task cost so much?'), a: t('Token cost per tool call, by project and date.') },
+              { q: t('Is AI-generated code secure?'), a: t('Scans every diff for secrets, injection, unsafe patterns.') },
+              { q: t('Why does AI keep failing?'), a: t('Replays thinking chain, highlights error loops.') },
+              { q: t("What's the ROI of AI coding?"), a: t('Acceptance rate, rollback rate, AI bug rate.') },
             ].map((item) => (
               <div key={item.q} className="bg-gray-800/50 rounded-lg p-3 hover:bg-gray-800 transition-colors">
                 <p className="text-sm text-gray-300 font-medium">{item.q}</p>
@@ -124,24 +126,24 @@ export function Overview() {
         {/* Recent Sessions */}
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-400">Recent Sessions</h3>
+            <h3 className="text-sm font-medium text-gray-400">{t('Recent Sessions')}</h3>
             <Link to="/sessions" className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1">
-              View all <ArrowRight size={12} />
+              {t('View all')} <ArrowRight size={12} />
             </Link>
           </div>
           {sessions.length === 0 ? (
             <p className="text-sm text-gray-600 text-center py-8">
-              No sessions yet. Start a devsorcerer proxy to capture AI activity.
+              {t('No sessions yet. Start a devsorcerer proxy to capture AI activity.')}
             </p>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-gray-500 border-b border-gray-800">
-                  <th className="text-left py-2 font-medium">Session</th>
-                  <th className="text-left py-2 font-medium">Agent</th>
-                  <th className="text-right py-2 font-medium">Tools</th>
-                  <th className="text-right py-2 font-medium">Cost</th>
-                  <th className="text-right py-2 font-medium">Status</th>
+                  <th className="text-left py-2 font-medium">{t('Session')}</th>
+                  <th className="text-left py-2 font-medium">{t('Agent')}</th>
+                  <th className="text-right py-2 font-medium">{t('Tools')}</th>
+                  <th className="text-right py-2 font-medium">{t('Cost')}</th>
+                  <th className="text-right py-2 font-medium">{t('Status')}</th>
                 </tr>
               </thead>
               <tbody>

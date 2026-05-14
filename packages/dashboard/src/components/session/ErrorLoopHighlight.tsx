@@ -1,11 +1,13 @@
 import type { TimelineStep } from '../../api/client';
 import { AlertTriangle, Repeat } from 'lucide-react';
+import { useT } from '../../i18n';
 
 interface ErrorLoopHighlightProps {
   steps: TimelineStep[];
 }
 
 export function ErrorLoopHighlight({ steps }: ErrorLoopHighlightProps) {
+  const { t } = useT();
   // Detect error loops: same tool called >= 3 times with errors in close succession
   const errorSteps = steps.filter((s) => s.isError && s.toolName);
   if (errorSteps.length === 0) return null;
@@ -37,7 +39,7 @@ export function ErrorLoopHighlight({ steps }: ErrorLoopHighlightProps) {
     <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle size={18} className="text-red-400" />
-        <h3 className="text-sm font-medium text-red-300">Error Loops Detected</h3>
+        <h3 className="text-sm font-medium text-red-300">{t('Error Loops Detected')}</h3>
       </div>
       {loops.map((loop, idx) => (
         <div
@@ -49,7 +51,7 @@ export function ErrorLoopHighlight({ steps }: ErrorLoopHighlightProps) {
             <span className="text-sm text-red-300 font-mono">{loop.toolName}</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-red-400">{loop.count} failed attempts</span>
+            <span className="text-sm text-red-400">{loop.count} {t('failed attempts')}</span>
             <span className="text-xs text-red-500">
               {(loop.end - loop.start) > 1000
                 ? `${((loop.end - loop.start) / 1000).toFixed(1)}s`

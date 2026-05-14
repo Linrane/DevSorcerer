@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { getSessions } from '../api/client';
 import { Link } from 'react-router-dom';
 import { Search, ListTree } from 'lucide-react';
+import { useT } from '../i18n';
 
 export function Sessions() {
+  const { t } = useT();
   const [filter, setFilter] = useState('');
   const { data, isLoading } = useQuery({
     queryKey: ['sessions', 'list'],
@@ -27,10 +29,10 @@ export function Sessions() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h2 className="text-xl font-semibold flex items-center gap-2">
-          <ListTree size={22} /> Sessions
+          <ListTree size={22} /> {t('Sessions')}
         </h2>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-600">{sessions.length} total</span>
+          <span className="text-xs text-gray-600">{sessions.length}{t(' total')}</span>
           <div className="relative">
             <Search
               size={16}
@@ -38,7 +40,7 @@ export function Sessions() {
             />
             <input
               type="text"
-              placeholder="Search sessions..."
+              placeholder={t('Search sessions...')}
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="pl-9 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500 w-full sm:w-64"
@@ -56,8 +58,8 @@ export function Sessions() {
       ) : sessions.length === 0 ? (
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center text-gray-500">
           <ListTree size={48} className="mx-auto mb-3 text-gray-700" />
-          <p>No sessions yet.</p>
-          <p className="text-sm mt-1">Start the devsorcerer proxy to begin capturing AI agent activity.</p>
+          <p>{t('No sessions yet.')}</p>
+          <p className="text-sm mt-1">{t('Start the devsorcerer proxy to begin capturing AI agent activity.')}</p>
         </div>
       ) : (
         <>
@@ -66,14 +68,14 @@ export function Sessions() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-gray-500 border-b border-gray-800 bg-gray-900/50">
-                  <th className="text-left py-3 px-4 font-medium">Session ID</th>
-                  <th className="text-left py-3 px-4 font-medium">Agent</th>
-                  <th className="text-left py-3 px-4 font-medium">Branch</th>
-                  <th className="text-left py-3 px-4 font-medium">Started</th>
-                  <th className="text-right py-3 px-4 font-medium">Events</th>
-                  <th className="text-right py-3 px-4 font-medium">Tokens</th>
-                  <th className="text-right py-3 px-4 font-medium">Cost</th>
-                  <th className="text-right py-3 px-4 font-medium">Status</th>
+                  <th className="text-left py-3 px-4 font-medium">{t('Session ID')}</th>
+                  <th className="text-left py-3 px-4 font-medium">{t('Agent')}</th>
+                  <th className="text-left py-3 px-4 font-medium">{t('Branch')}</th>
+                  <th className="text-left py-3 px-4 font-medium">{t('Started')}</th>
+                  <th className="text-right py-3 px-4 font-medium">{t('Events')}</th>
+                  <th className="text-right py-3 px-4 font-medium">{t('Tokens')}</th>
+                  <th className="text-right py-3 px-4 font-medium">{t('Cost')}</th>
+                  <th className="text-right py-3 px-4 font-medium">{t('Status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -167,7 +169,7 @@ export function Sessions() {
 
           {filtered.length === 0 && (
             <div className="p-8 text-center text-gray-500">
-              No sessions matching "{filter}".
+              {t('No sessions matching')} "{filter}".
             </div>
           )}
         </>

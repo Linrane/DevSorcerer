@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Wrench, AlertTriangle, Clock, FileText } from 'lucide-react';
 import type { TimelineStep } from '../../api/client';
+import { useT } from '../../i18n';
 
 interface SessionReplayProps {
   steps: TimelineStep[];
 }
 
 export function SessionReplay({ steps }: SessionReplayProps) {
+  const { t } = useT();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1); // 1x, 2x, 4x
@@ -53,7 +55,7 @@ export function SessionReplay({ steps }: SessionReplayProps) {
     return (
       <div className="text-center text-gray-500 py-12">
         <FileText size={32} className="mx-auto mb-2 text-gray-700" />
-        <p className="text-sm">No timeline data available.</p>
+        <p className="text-sm">{t('No timeline data available.')}</p>
       </div>
     );
   }
@@ -90,14 +92,14 @@ export function SessionReplay({ steps }: SessionReplayProps) {
               onClick={() => goToStep(0)}
               disabled={currentIndex === 0}
               className="p-1.5 text-gray-400 hover:text-gray-200 disabled:text-gray-700"
-              title="Start"
+              title={t('Start')}
             >
               <SkipBack size={16} />
             </button>
             <button
               onClick={() => setIsPlaying(!isPlaying)}
               className="p-2 bg-purple-600 hover:bg-purple-700 rounded-full text-white"
-              title={isPlaying ? 'Pause' : 'Play'}
+              title={isPlaying ? t('Pause') : t('Play')}
             >
               {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
             </button>
@@ -105,12 +107,12 @@ export function SessionReplay({ steps }: SessionReplayProps) {
               onClick={() => goToStep(stepCount - 1)}
               disabled={currentIndex >= stepCount - 1}
               className="p-1.5 text-gray-400 hover:text-gray-200 disabled:text-gray-700"
-              title="End"
+              title={t('End')}
             >
               <SkipForward size={16} />
             </button>
             <span className="text-sm text-gray-500 ml-2">
-              Step {currentIndex + 1} / {stepCount}
+              {t('Step')} {currentIndex + 1} / {stepCount}
             </span>
           </div>
 
@@ -138,11 +140,11 @@ export function SessionReplay({ steps }: SessionReplayProps) {
         <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-800 text-xs text-gray-500">
           <span className="flex items-center gap-1">
             <AlertTriangle size={12} className="text-red-400" />
-            {errorCount} errors
+            {errorCount} {t('errors')}
           </span>
           <span className="flex items-center gap-1">
             <Clock size={12} />
-            {(totalLatency / 1000).toFixed(1)}s total latency
+            {(totalLatency / 1000).toFixed(1)}s {t('total latency')}
           </span>
         </div>
       </div>
@@ -168,7 +170,7 @@ export function SessionReplay({ steps }: SessionReplayProps) {
                 </span>
                 {currentStep.isError && (
                   <span className="text-xs px-1.5 py-0.5 rounded bg-red-500/10 text-red-400">
-                    Error
+                    {t('Error')}
                   </span>
                 )}
                 <span className="text-xs text-gray-600">
@@ -180,7 +182,7 @@ export function SessionReplay({ steps }: SessionReplayProps) {
               )}
               {currentStep.latencyMs && (
                 <p className="text-xs text-gray-600 mt-1">
-                  Latency: {currentStep.latencyMs > 1000
+                  {t('Latency')}: {currentStep.latencyMs > 1000
                     ? `${(currentStep.latencyMs / 1000).toFixed(1)}s`
                     : `${currentStep.latencyMs}ms`}
                 </p>

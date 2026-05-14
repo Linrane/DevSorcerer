@@ -4,8 +4,10 @@ import { getSession, getSessionTimeline } from '../api/client';
 import { SessionReplay } from '../components/session/SessionReplay';
 import { ErrorLoopHighlight } from '../components/session/ErrorLoopHighlight';
 import { ChevronRight } from 'lucide-react';
+import { useT } from '../i18n';
 
 export function SessionDetail() {
+  const { t } = useT();
   const { id } = useParams<{ id: string }>();
 
   const { data: session, isLoading: sessionLoading } = useQuery({
@@ -22,7 +24,6 @@ export function SessionDetail() {
 
   const isLoading = sessionLoading || timelineLoading;
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -41,9 +42,9 @@ export function SessionDetail() {
   if (!session) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Session not found.</p>
+        <p className="text-gray-500">{t('Session not found.')}</p>
         <Link to="/sessions" className="text-sm text-purple-400 hover:text-purple-300 mt-2 inline-block">
-          Back to sessions
+          {t('Back to sessions')}
         </Link>
       </div>
     );
@@ -60,7 +61,7 @@ export function SessionDetail() {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500">
-        <Link to="/sessions" className="hover:text-gray-300">Sessions</Link>
+        <Link to="/sessions" className="hover:text-gray-300">{t('Sessions')}</Link>
         <ChevronRight size={14} />
         <span className="text-gray-400 font-mono text-xs">{id?.slice(0, 16)}...</span>
       </div>
@@ -69,7 +70,7 @@ export function SessionDetail() {
       <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xl font-semibold font-mono text-purple-400">
-            Session {session.id.slice(0, 20)}...
+            {t('Session')} {session.id.slice(0, 20)}...
           </h2>
           <span
             className={`px-3 py-1 rounded-lg text-sm font-medium ${
@@ -85,19 +86,19 @@ export function SessionDetail() {
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
           <div>
-            <span className="text-gray-500">Agent: </span>
+            <span className="text-gray-500">{t('Agent:')} </span>
             <span className="text-gray-300">{session.agentName} v{session.agentVersion || '?'}</span>
           </div>
           <div>
-            <span className="text-gray-500">Branch: </span>
-            <span className="text-gray-300 font-mono">{session.branch || 'unknown'}</span>
+            <span className="text-gray-500">{t('Branch:')} </span>
+            <span className="text-gray-300 font-mono">{session.branch || t('unknown')}</span>
           </div>
           <div>
-            <span className="text-gray-500">Started: </span>
+            <span className="text-gray-500">{t('Started:')} </span>
             <span className="text-gray-300">{new Date(session.startedAt).toLocaleString()}</span>
           </div>
           <div>
-            <span className="text-gray-500">Cost: </span>
+            <span className="text-gray-500">{t('Cost:')} </span>
             <span className="text-green-400 font-mono">${session.totalCost.toFixed(4)}</span>
           </div>
         </div>
@@ -105,17 +106,17 @@ export function SessionDetail() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-        <StatBox label="Events" value={session.totalEvents.toLocaleString()} />
-        <StatBox label="Tokens" value={`${(session.totalTokens / 1000).toFixed(1)}K`} />
-        <StatBox label="Cost" value={`$${session.totalCost.toFixed(3)}`} color="text-green-400" />
-        <StatBox label="Tool Calls" value={toolCalls.length} />
-        <StatBox label="Errors" value={errors.length} color={errors.length > 0 ? 'text-red-400' : undefined} />
-        <StatBox label="Duration" value={duration > 0 ? `${duration}s` : '-'} />
+        <StatBox label={t('Events')} value={session.totalEvents.toLocaleString()} />
+        <StatBox label={t('Tokens')} value={`${(session.totalTokens / 1000).toFixed(1)}K`} />
+        <StatBox label={t('Cost')} value={`$${session.totalCost.toFixed(3)}`} color="text-green-400" />
+        <StatBox label={t('Tool Calls')} value={toolCalls.length} />
+        <StatBox label={t('Errors')} value={errors.length} color={errors.length > 0 ? 'text-red-400' : undefined} />
+        <StatBox label={t('Duration')} value={duration > 0 ? `${duration}s` : '-'} />
       </div>
 
       {/* Session Replay Player */}
       <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-        <h3 className="text-sm font-medium text-gray-400 mb-4">Timeline Replay</h3>
+        <h3 className="text-sm font-medium text-gray-400 mb-4">{t('Timeline Replay')}</h3>
         <SessionReplay steps={steps} />
       </div>
 
@@ -123,16 +124,15 @@ export function SessionDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ErrorLoopHighlight steps={steps} />
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">Tool Call Summary</h3>
+          <h3 className="text-sm font-medium text-gray-400 mb-3">{t('Tool Call Summary')}</h3>
           <div className="space-y-2 max-h-80 overflow-y-auto">
             {toolCalls.length === 0 ? (
-              <p className="text-sm text-gray-600 text-center py-4">No tool calls in this session.</p>
+              <p className="text-sm text-gray-600 text-center py-4">{t('No tool calls in this session.')}</p>
             ) : (
-              // Aggregate by tool name
               (() => {
                 const counts: Record<string, { count: number; errors: number; totalLatency: number }> = {};
                 toolCalls.forEach((s) => {
-                  const name = s.toolName || 'unknown';
+                  const name = s.toolName || t('unknown');
                   if (!counts[name]) counts[name] = { count: 0, errors: 0, totalLatency: 0 };
                   counts[name].count++;
                   if (s.isError) counts[name].errors++;
@@ -145,11 +145,11 @@ export function SessionDetail() {
                       <div>
                         <span className="text-sm text-gray-300">{name}</span>
                         {stats.errors > 0 && (
-                          <span className="text-xs text-red-400 ml-2">({stats.errors} errors)</span>
+                          <span className="text-xs text-red-400 ml-2">({stats.errors} {t('errors')})</span>
                         )}
                       </div>
                       <div className="text-xs text-gray-500">
-                        <span className="mr-3">{stats.count} calls</span>
+                        <span className="mr-3">{stats.count} {t('calls')}</span>
                         <span>{(stats.totalLatency / 1000).toFixed(1)}s</span>
                       </div>
                     </div>

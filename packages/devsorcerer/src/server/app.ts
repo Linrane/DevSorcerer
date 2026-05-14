@@ -83,7 +83,7 @@ export async function createApp(): Promise<FastifyInstance> {
   // Health check
   app.get('/api/health', async () => ({
     status: 'ok',
-    version: '0.2.0',
+    version: '0.2.2',
     uptime: process.uptime(),
   }));
 

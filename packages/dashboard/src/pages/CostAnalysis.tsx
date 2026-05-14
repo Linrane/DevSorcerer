@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { getSessions, getCostAnalysis } from '../api/client';
 import { CostTrendChart } from '../components/charts/CostTrendChart';
 import { ToolUsagePie } from '../components/charts/ToolUsagePie';
+import { useT } from '../i18n';
 
 export function CostAnalysis() {
+  const { t } = useT();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
 
@@ -35,7 +37,7 @@ export function CostAnalysis() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Cost Analysis</h2>
+        <h2 className="text-xl font-semibold">{t('Cost Analysis')}</h2>
         <div className="flex gap-2">
           {(['7d', '30d', '90d', 'all'] as const).map((r) => (
             <button
@@ -63,7 +65,7 @@ export function CostAnalysis() {
               : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
           }`}
         >
-          All Sessions
+          {t('All Sessions')}
         </button>
         {sessions.slice(0, 10).map((s) => (
           <button
@@ -83,11 +85,11 @@ export function CostAnalysis() {
       {/* Cost Charts */}
       <div className="grid grid-cols-2 gap-6">
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-          <h3 className="text-sm font-medium text-gray-400 mb-4">Cost Trend</h3>
+          <h3 className="text-sm font-medium text-gray-400 mb-4">{t('Cost Trend')}</h3>
           <CostTrendChart />
         </div>
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-          <h3 className="text-sm font-medium text-gray-400 mb-4">Tool Cost Breakdown</h3>
+          <h3 className="text-sm font-medium text-gray-400 mb-4">{t('Tool Cost Breakdown')}</h3>
           <ToolUsagePie />
         </div>
       </div>
@@ -98,12 +100,12 @@ export function CostAnalysis() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-gray-500 border-b border-gray-800 bg-gray-900/50">
-                <th className="text-left py-3 px-4 font-medium">Tool</th>
-                <th className="text-right py-3 px-4 font-medium">Calls</th>
-                <th className="text-right py-3 px-4 font-medium">Input Tokens</th>
-                <th className="text-right py-3 px-4 font-medium">Output Tokens</th>
-                <th className="text-right py-3 px-4 font-medium">Cost</th>
-                <th className="text-right py-3 px-4 font-medium">% of Total</th>
+                <th className="text-left py-3 px-4 font-medium">{t('Tool')}</th>
+                <th className="text-right py-3 px-4 font-medium">{t('Calls')}</th>
+                <th className="text-right py-3 px-4 font-medium">{t('Input Tokens')}</th>
+                <th className="text-right py-3 px-4 font-medium">{t('Output Tokens')}</th>
+                <th className="text-right py-3 px-4 font-medium">{t('Cost')}</th>
+                <th className="text-right py-3 px-4 font-medium">{t('% of Total')}</th>
               </tr>
             </thead>
             <tbody>

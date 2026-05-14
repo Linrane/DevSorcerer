@@ -11,6 +11,7 @@ import {
   X,
   Eye,
 } from 'lucide-react';
+import { useT } from '../../i18n';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Overview' },
@@ -30,6 +31,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const location = useLocation();
+  const { t } = useT();
 
   return (
     <>
@@ -58,7 +60,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <button
             onClick={onClose}
             className="lg:hidden text-gray-500 hover:text-gray-300"
-            aria-label="Close sidebar"
+            aria-label={t('Close sidebar')}
           >
             <X size={18} />
           </button>
@@ -84,7 +86,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 }`}
               >
                 <item.icon size={18} />
-                {item.label}
+                {t(item.label)}
               </NavLink>
             );
           })}
@@ -92,7 +94,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Footer */}
         <div className="px-4 py-3 border-t border-gray-800 flex-shrink-0">
-          <span className="text-xs text-gray-600">DevSorcerer v0.2.0</span>
+          <span className="text-xs text-gray-600">DevSorcerer v0.2.2</span>
         </div>
       </aside>
     </>

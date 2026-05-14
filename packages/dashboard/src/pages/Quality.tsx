@@ -3,8 +3,10 @@ import { getSessions, getQualityAnalysis } from '../api/client';
 import { QualityTimelineChart } from '../components/charts/QualityTimelineChart';
 import { TrendingUp, RotateCcw, Bug, CheckCircle, FileEdit, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
+import { useT } from '../i18n';
 
 export function Quality() {
+  const { t } = useT();
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const { data: sessionsData } = useQuery({
     queryKey: ['sessions', 'quality'],
@@ -28,10 +30,10 @@ export function Quality() {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold flex items-center gap-2">
-        <ThumbsUp size={22} /> Quality Metrics
+        <ThumbsUp size={22} /> {t('Quality Metrics')}
       </h2>
       <p className="text-sm text-gray-500">
-        Measure how much AI-generated code is accepted, modified, or rolled back — so you can track ROI and code quality.
+        {t('Measure how much AI-generated code is accepted, modified, or rolled back — so you can track ROI and code quality.')}
       </p>
 
       {/* Session selector */}
@@ -65,28 +67,28 @@ export function Quality() {
           {/* Stat Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              label="Acceptance Rate"
+              label={t('Acceptance Rate')}
               value={`${q.acceptanceRate}%`}
               icon={CheckCircle}
               color="text-green-400"
               bg="bg-green-500/10"
             />
             <StatCard
-              label="Files Created"
+              label={t('Files Created')}
               value={q.filesCreated ?? 0}
               icon={FileEdit}
               color="text-blue-400"
               bg="bg-blue-500/10"
             />
             <StatCard
-              label="Rollbacks"
+              label={t('Rollbacks')}
               value={q.rollbackCount ?? 0}
               icon={RotateCcw}
               color="text-orange-400"
               bg="bg-orange-500/10"
             />
             <StatCard
-              label="AI Bugs"
+              label={t('AI Bugs')}
               value={q.bugCount ?? '-'}
               icon={Bug}
               color={q.bugCount ? 'text-red-400' : 'text-gray-500'}
@@ -96,22 +98,22 @@ export function Quality() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-gray-900 rounded-xl border border-gray-800 p-5">
-              <h3 className="text-sm font-medium text-gray-400 mb-4">Quality Radar</h3>
+              <h3 className="text-sm font-medium text-gray-400 mb-4">{t('Quality Radar')}</h3>
               <QualityTimelineChart />
             </div>
             <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-              <h3 className="text-sm font-medium text-gray-400 mb-4">Details</h3>
+              <h3 className="text-sm font-medium text-gray-400 mb-4">{t('Details')}</h3>
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Files Modified</span>
+                  <span className="text-gray-500">{t('Files Modified')}</span>
                   <span className="text-gray-300 font-mono">{q.filesModified}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Files Accepted</span>
+                  <span className="text-gray-500">{t('Files Accepted')}</span>
                   <span className="text-green-400 font-mono">{q.filesAccepted}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Acceptance</span>
+                  <span className="text-gray-500">{t('Acceptance')}</span>
                   <span className={`font-mono ${q.acceptanceRate >= 80 ? 'text-green-400' : q.acceptanceRate >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
                     {q.acceptanceRate}%
                   </span>
@@ -123,9 +125,9 @@ export function Quality() {
       ) : (
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center text-gray-500">
           <TrendingUp size={48} className="mx-auto mb-3 text-gray-700" />
-          <p>Select a session to view quality metrics.</p>
+          <p>{t('Select a session to view quality metrics.')}</p>
           <p className="text-sm mt-1 max-w-md mx-auto">
-            Quality analysis measures AI code acceptance rate, rollback frequency, and AI-introduced bugs via git history.
+            {t('Quality analysis measures AI code acceptance rate, rollback frequency, and AI-introduced bugs via git history.')}
           </p>
         </div>
       )}

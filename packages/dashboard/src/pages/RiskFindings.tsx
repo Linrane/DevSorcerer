@@ -11,15 +11,21 @@ import {
 } from 'lucide-react';
 import type { RiskFinding } from '../api/client';
 import { useState } from 'react';
+import { useT } from '../i18n';
 
-const severityConfig = {
-  critical: { icon: Shield, color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30', label: 'CRITICAL' },
-  high: { icon: AlertTriangle, color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30', label: 'HIGH' },
-  medium: { icon: AlertCircle, color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', label: 'MEDIUM' },
-  low: { icon: Info, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30', label: 'LOW' },
-};
+function useSeverityConfig() {
+  const { t } = useT();
+  return {
+    critical: { icon: Shield, color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30', label: t('CRITICAL') },
+    high: { icon: AlertTriangle, color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30', label: t('HIGH') },
+    medium: { icon: AlertCircle, color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', label: t('MEDIUM') },
+    low: { icon: Info, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30', label: t('LOW') },
+  };
+}
 
 export function RiskFindings() {
+  const { t } = useT();
+  const severityConfig = useSeverityConfig();
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const { data: sessionsData } = useQuery({
     queryKey: ['sessions', 'risk'],
@@ -53,7 +59,7 @@ export function RiskFindings() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold flex items-center gap-2">
-          <Shield size={24} /> Risk Findings
+          <Shield size={24} /> {t('Risk Findings')}
         </h2>
         {overallScore > 0 && (
           <div
@@ -65,7 +71,7 @@ export function RiskFindings() {
                   : 'bg-green-500/10 text-green-400'
             }`}
           >
-            Risk Score: {overallScore}/100
+            {t('Risk Score:')} {overallScore}/100
           </div>
         )}
       </div>
@@ -97,16 +103,16 @@ export function RiskFindings() {
       ) : findings.length === 0 ? (
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-12 text-center text-gray-500">
           <Shield size={48} className="mx-auto mb-3 text-gray-700" />
-          <p>Select a session to scan for security risks.</p>
+          <p>{t('Select a session to scan for security risks.')}</p>
           <p className="text-sm mt-1 max-w-md mx-auto">
-            Each AI-generated code diff is scanned against 8 security rules — secrets, injection, path traversal, eval, crypto, auth, and more.
+            {t('Each AI-generated code diff is scanned against 8 security rules — secrets, injection, path traversal, eval, crypto, auth, and more.')}
           </p>
         </div>
       ) : (
         <div className="space-y-6">
           {/* Severity summary bar */}
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-5">
-            <h3 className="text-sm font-medium text-gray-400 mb-4">Severity Breakdown</h3>
+            <h3 className="text-sm font-medium text-gray-400 mb-4">{t('Severity Breakdown')}</h3>
             <div className="space-y-3">
               {(['critical', 'high', 'medium', 'low'] as const).map((severity) => {
                 const count = bySeverity[severity];
