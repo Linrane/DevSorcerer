@@ -98,6 +98,29 @@ export interface ImportResult {
   error?: string;
 }
 
+function extractTitle(lines: string[]): string {
+  for (const line of lines) {
+    try {
+      const entry: CCEntry = JSON.parse(line);
+      if (entry.type !== 'user' || !entry.message?.content) continue;
+      for (const block of entry.message.content) {
+        if (block.type !== 'text' || !block.text) continue;
+        const t = block.text.trim();
+        // Skip non-content: ide selections, image refs, continue prompts, skill base dirs
+        if (t.startsWith('<ide_') || t.startsWith('[Image:') ||
+            t === 'Continue from where you left off.' ||
+            t.startsWith('[Request interrupted') ||
+            t.startsWith('Base directory for this skill:')) continue;
+        if (t.length < 8) continue;
+        // Clean up: collapse whitespace, truncate
+        const clean = t.replace(/\s+/g, ' ').trim();
+        return clean.length > 100 ? clean.slice(0, 97) + '...' : clean;
+      }
+    } catch { /* skip */ }
+  }
+  return '';
+}
+
 export function importSessionFile(jsonlPath: string): ImportResult {
   const raw = fs.readFileSync(jsonlPath, 'utf-8');
   const lines = raw.trim().split('\n');
@@ -108,6 +131,7 @@ export function importSessionFile(jsonlPath: string): ImportResult {
   let gitBranch = '';
   let agentVersion = '';
   let agentName = 'claude-code';
+  let modelName = '';
   let startedAt = Date.now();
 
   for (const line of lines) {
@@ -118,40 +142,95 @@ export function importSessionFile(jsonlPath: string): ImportResult {
       if (entry.gitBranch) gitBranch = entry.gitBranch;
       if (entry.version) agentVersion = entry.version;
       if (entry.entrypoint) agentName = entry.entrypoint;
+      if (entry.message?.model && !modelName) modelName = entry.message.model;
       if (entry.timestamp && !startedAt) {
         startedAt = new Date(entry.timestamp).getTime();
       }
-      if (sessionId && cwd) break;
+      if (sessionId && cwd && modelName) break;
     } catch { /* skip malformed lines */ }
+  }
+
+  // Extract session title from first meaningful user message
+  let title = extractTitle(lines);
+
+  // Generate fallback title for sessions without a meaningful user message
+  if (!title) {
+    // Count tool calls for context
+    let toolCount = 0;
+    const toolNames = new Set<string>();
+    for (const line of lines) {
+      try {
+        const e: CCEntry = JSON.parse(line);
+        if (e.type === 'assistant' && e.message?.content) {
+          for (const b of e.message.content) {
+            if (b.type === 'tool_use' && b.name) {
+              toolCount++;
+              toolNames.add(b.name);
+            }
+          }
+        }
+      } catch { /* skip */ }
+    }
+    if (toolCount > 0) {
+      const topTools = [...toolNames].slice(0, 3).join(', ');
+      title = `${toolCount} tool calls${topTools ? ' — ' + topTools : ''}`;
+    } else {
+      title = 'Conversation session';
+    }
   }
 
   if (!sessionId) {
     return { sessionId: '', projectId: '', totalTokens: 0, totalCost: 0, toolCalls: 0, skipped: true, error: 'No sessionId found' };
   }
 
+  const db = getDb();
+
   if (sessionExists(sessionId)) {
+    // Backfill metadata if empty (for sessions imported before title extraction was added)
+    const existing = db.prepare('SELECT metadata FROM sessions WHERE id = ?').get(sessionId) as
+      { metadata: string } | undefined;
+    if (existing) {
+      try {
+        const meta = JSON.parse(existing.metadata || '{}');
+        if (!meta.title && title) {
+          meta.title = title;
+          if (!meta.model && modelName) meta.model = modelName;
+          db.prepare('UPDATE sessions SET metadata = ? WHERE id = ?').run(JSON.stringify(meta), sessionId);
+        }
+      } catch { /* ignore parse errors */ }
+    }
     return { sessionId, projectId: '', totalTokens: 0, totalCost: 0, toolCalls: 0, skipped: true };
   }
 
   const projectId = buildProjectId(cwd || process.cwd());
   upsertProject(projectId, cwd || process.cwd());
 
-  const db = getDb();
   const pricing = resolvePricing();
 
-  // Create session
-  const firstTs = lines.length > 0 ? (() => {
-    try { return new Date((JSON.parse(lines[0]!) as CCEntry).timestamp || '').getTime(); } catch { return Date.now(); }
-  })() : Date.now();
+  // Resolve actual start/end timestamps by scanning for the earliest & latest timestamp
+  let firstTs = Date.now();
+  let lastTs = Date.now();
+  let foundFirst = false;
+  for (const line of lines) {
+    try {
+      const e: CCEntry = JSON.parse(line);
+      const ts = e.timestamp ? new Date(e.timestamp).getTime() : NaN;
+      if (!isNaN(ts)) {
+        if (!foundFirst) { firstTs = ts; foundFirst = true; }
+        lastTs = ts;
+      }
+    } catch { /* skip */ }
+  }
+  if (!foundFirst) {
+    // Fallback: use file modification time
+    try { firstTs = lastTs = fs.statSync(jsonlPath).mtimeMs; } catch { /* keep Date.now() */ }
+  }
 
-  const lastTs = lines.length > 0 ? (() => {
-    try { return new Date((JSON.parse(lines[lines.length - 1]!) as CCEntry).timestamp || '').getTime(); } catch { return Date.now(); }
-  })() : Date.now();
-
+  const metadata = JSON.stringify({ title, model: modelName });
   db.prepare(
     `INSERT INTO sessions (id, project_id, agent_name, agent_version, branch, status, started_at, ended_at, metadata)
-     VALUES (?, ?, ?, ?, ?, 'completed', ?, ?, '{}')`,
-  ).run(sessionId, projectId, agentName, agentVersion || null, gitBranch || null, firstTs, lastTs);
+     VALUES (?, ?, ?, ?, ?, 'completed', ?, ?, ?)`,
+  ).run(sessionId, projectId, agentName, agentVersion || null, gitBranch || null, firstTs, lastTs, metadata);
 
   // Process assistant messages.
   // Streaming produces multiple entries per message.id (thinking + text/tool_use chunks).

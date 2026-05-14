@@ -36,8 +36,8 @@
       "outputPer1k": 0.04
     },
     "deepseek-v4-pro": {
-      "inputPer1k": 0.00055,
-      "outputPer1k": 0.00219
+      "inputPer1k": 0.00042,
+      "outputPer1k": 0.00083
     },
     "deepseek-v4": {
       "inputPer1k": 0.0015,

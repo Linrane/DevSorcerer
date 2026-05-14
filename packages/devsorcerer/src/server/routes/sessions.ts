@@ -10,6 +10,38 @@ import {
 } from '../../storage/repositories/events.js';
 import { BottleneckAnalyzer } from '../../analyzer/bottleneck.js';
 import { importAllClaudeCodeSessions } from '../../import/sessionImporter.js';
+import { getDb } from '../../storage/db.js';
+
+function enrichSession(s: ReturnType<typeof getSession>): Record<string, unknown> | null {
+  if (!s) return null;
+  const db = getDb();
+
+  // Look up project name
+  const proj = db.prepare('SELECT name FROM projects WHERE id = ?').get(s.projectId) as
+    { name: string } | undefined;
+
+  // Parse metadata for title and model
+  let title = '';
+  let modelName = '';
+  try {
+    const meta = s.metadata && typeof s.metadata === 'object' ? s.metadata as Record<string, unknown> : {};
+    title = (meta.title as string) || '';
+    modelName = (meta.model as string) || '';
+  } catch { /* use defaults */ }
+
+  // Fallback: extract model from agentName (e.g. "Claude Code (deepseek-v4-pro)")
+  if (!modelName) {
+    const m = s.agentName.match(/\(([^)]+)\)$/);
+    if (m?.[1]) modelName = m[1];
+  }
+
+  return {
+    ...s,
+    projectName: proj?.name || s.projectId,
+    title,
+    modelName,
+  };
+}
 
 export async function sessionRoutes(app: FastifyInstance): Promise<void> {
   // Import Claude Code sessions
@@ -41,7 +73,7 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
       query.limit ? parseInt(query.limit, 10) : 50,
       query.offset ? parseInt(query.offset, 10) : 0,
     );
-    return { sessions };
+    return { sessions: sessions.map(enrichSession).filter(Boolean) };
   });
 
   // Get session detail
@@ -52,7 +84,7 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
       reply.code(404);
       return { error: 'Session not found' };
     }
-    return session;
+    return enrichSession(session);
   });
 
   // Get session events

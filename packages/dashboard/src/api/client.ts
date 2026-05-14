@@ -162,6 +162,9 @@ export interface Session {
   totalEvents: number;
   totalTokens: number;
   totalCost: number;
+  projectName?: string;
+  title?: string;
+  modelName?: string;
 }
 
 export interface TimelineStep {

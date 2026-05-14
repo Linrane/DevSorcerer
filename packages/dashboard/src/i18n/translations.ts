@@ -69,9 +69,11 @@ const zh: Record<string, string> = {
   'Start the devsorcerer proxy to begin capturing AI agent activity.': '启动 devsorcerer 代理以开始捕获 AI 代理活动。',
   'Session ID': '会话 ID',
   'Branch': '分支',
+  'Project': '项目',
   'Started': '开始时间',
   'Events': '事件',
   'Tokens': 'Token',
+  'tools': '工具',
   'No sessions matching': '没有匹配的会话',
   ' total': ' 总计',
 
