@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.2.2-purple" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.2.3-purple" alt="Version">
   <img src="https://img.shields.io/badge/node-%3E%3D22-green" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/dashboard-react%2019-61dafb" alt="React 19">
@@ -173,11 +173,41 @@ Add to your agent's MCP config:
 
 Compatible with: Claude Code, Cursor, Windsurf, Continue, Cline, Codex CLI, and any MCP agent.
 
+### Claude Code Session Monitoring (NEW in v0.2.3)
+
+For Claude Code users, DevSorcerer now imports your actual session history directly — no MCP proxy needed. It reads Claude Code's native JSONL session files and populates the dashboard with real conversation data including tool calls, token usage, and costs.
+
+```bash
+# 1. Import all existing Claude Code sessions
+node scripts/import-sessions.mjs
+
+# 2. Start the dashboard
+devsorcerer start
+
+# Or use the combined startup script:
+bash scripts/start.sh
+
+# For continuous monitoring, use watch mode:
+node scripts/import-sessions.mjs --watch
+```
+
+**How it works:**
+- Reads `~/.claude/projects/<project>/<session>.jsonl` files
+- Extracts tool calls, token usage, model info, and session metadata
+- Idempotent: re-running only imports new sessions, won't duplicate
+
+**Dashboard will show:**
+- All Claude Code sessions with agent version, branch, status
+- Step-by-step timeline replay of tool calls
+- Cost breakdown by tool, model, and session
+- Token usage trends over time
+
 ### CLI Commands
 
 | Command | Description |
 |---|---|
 | `devsorcerer start` | Start server + dashboard |
+| `devsorcerer import` | Import Claude Code session history (via `scripts/import-sessions.mjs`) |
 | `devsorcerer validate` | Pre-flight checks (config, DB, git, Node.js) |
 | `devsorcerer status` | Database stats |
 | `devsorcerer analyze cost` | Cost by project / session / tool |
@@ -400,11 +430,41 @@ devsorcerer start
 
 兼容：Claude Code、Cursor、Windsurf、Continue、Cline、Codex CLI 等所有 MCP agent。
 
+### Claude Code 会话监控（v0.2.3 新增）
+
+Claude Code 用户现在可以直接导入真实的会话历史 —— 无需 MCP 代理。DevSorcerer 读取 Claude Code 的原生 JSONL 会话文件，将工具调用、token 用量和成本等数据导入仪表盘。
+
+```bash
+# 1. 导入所有 Claude Code 历史会话
+node scripts/import-sessions.mjs
+
+# 2. 启动仪表盘
+devsorcerer start
+
+# 或者用一键启动脚本：
+bash scripts/start.sh
+
+# 持续监控模式（每30秒自动导入新会话）：
+node scripts/import-sessions.mjs --watch
+```
+
+**工作原理：**
+- 读取 `~/.claude/projects/<project>/<session>.jsonl` 文件
+- 提取工具调用、token 用量、模型信息和会话元数据
+- 幂等操作：重复运行只导入新会话，不会重复
+
+**仪表盘将显示：**
+- 所有 Claude Code 会话（含版本、分支、状态）
+- 逐步时间线回放工具调用
+- 按工具、模型、会话的成本明细
+- 时间段内 token 用量趋势
+
 ### CLI 命令一览
 
 | 命令 | 说明 |
 |---|---|
 | `devsorcerer start` | 启动服务 + 仪表盘 |
+| `devsorcerer import` | 导入 Claude Code 会话历史（通过 `scripts/import-sessions.mjs`） |
 | `devsorcerer validate` | 预检（配置、数据库、git、Node.js 版本） |
 | `devsorcerer status` | 数据库统计 |
 | `devsorcerer analyze cost` | 按项目/会话/工具分析成本 |

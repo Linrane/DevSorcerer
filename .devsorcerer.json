@@ -1,0 +1,7 @@
+{
+  "serverPort": 3199,
+  "dbPath": "d:/LInranesLittleBox/WorkingAndLearning/PersonalProject/DevTwin/.vault/devsorcerer.sqlite",
+  "lancedbPath": "d:/LInranesLittleBox/WorkingAndLearning/PersonalProject/DevTwin/.vault/lancedb",
+  "captureEnabled": true,
+  "dashboardEnabled": true
+}

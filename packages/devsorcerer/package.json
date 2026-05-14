@@ -1,6 +1,6 @@
 {
   "name": "devsorcerer",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Black box for your AI coding agents — cost/risk/quality analytics and knowledge search",
   "type": "module",
   "main": "./dist/index.js",

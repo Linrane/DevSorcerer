@@ -24,7 +24,7 @@ import { ValidateCommand } from '../src/cli/commands/validate.js';
 const cli = new Cli({
   binaryLabel: 'DevSorcerer',
   binaryName: 'devsorcerer',
-  binaryVersion: '0.2.2',
+  binaryVersion: '0.2.3',
 });
 
 // Register all commands
