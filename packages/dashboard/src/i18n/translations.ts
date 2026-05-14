@@ -21,6 +21,7 @@ const zh: Record<string, string> = {
   'Knowledge': '知识',
   'Audit': '审计',
   'Settings': '设置',
+  'Status': '状态',
   'Close sidebar': '关闭侧边栏',
 
   // Header
@@ -235,6 +236,24 @@ const zh: Record<string, string> = {
   'Low Bugs': '低缺陷',
   'Created': '已创建',
   'Modified': '已修改',
+
+  // Status labels (displayed in tables/cards)
+  'completed': '已完成',
+  'error': '错误',
+  'active': '运行中',
+
+  // Knowledge search
+  'in': '用时',
+
+  // Settings pricing
+  'default (fallback)': '默认（回退）',
+
+  // Placeholders
+  'In $/1k': '输入 $/1k',
+  'Out $/1k': '输出 $/1k',
+
+  // Session replay
+  'Error at step {n}': '第 {n} 步错误',
 };
 
 export const translations: Record<Language, Record<string, string>> = {

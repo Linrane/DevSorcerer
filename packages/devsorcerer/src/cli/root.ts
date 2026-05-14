@@ -22,10 +22,10 @@ export class RootCommand extends Command {
 
   async execute(): Promise<number> {
     if (this.showVersion) {
-      this.context.stdout.write('0.3.0\n');
+      this.context.stdout.write('0.3.1\n');
       return 0;
     }
-    this.context.stdout.write('DevSorcerer v0.3.0\n');
+    this.context.stdout.write('DevSorcerer v0.3.1\n');
     this.context.stdout.write('Run "devsorcerer --help" for available commands.\n');
     return 0;
   }

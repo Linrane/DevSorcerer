@@ -81,7 +81,7 @@ export function SessionDetail() {
                   : 'bg-blue-500/10 text-blue-400'
             }`}
           >
-            {session.status}
+            {t(session.status)}
           </span>
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">

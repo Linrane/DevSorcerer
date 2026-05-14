@@ -287,7 +287,7 @@ export function Settings() {
         {/* Default fallback pricing */}
         {pricing.default && (
           <div className="flex items-center gap-3 bg-gray-800/30 rounded-lg px-3 py-2 border border-dashed border-gray-700">
-            <span className="text-xs text-gray-500 font-mono flex-1">default (fallback)</span>
+            <span className="text-xs text-gray-500 font-mono flex-1">{t('default (fallback)')}</span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500">{t('In')}: <span className="text-gray-300 font-mono">{pricing.default.inputPer1k}</span></span>
               <span className="text-xs text-gray-500">{t('Out')}: <span className="text-gray-300 font-mono">{pricing.default.outputPer1k}</span></span>
@@ -309,14 +309,14 @@ export function Settings() {
             />
             <input
               type="number" step="0.0001" min="0.0001"
-              placeholder="In $/1k"
+              placeholder={t('In $/1k')}
               value={newInput}
               onChange={(e) => setNewInput(e.target.value)}
               className="w-24 px-2 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 text-right font-mono"
             />
             <input
               type="number" step="0.0001" min="0.0001"
-              placeholder="Out $/1k"
+              placeholder={t('Out $/1k')}
               value={newOutput}
               onChange={(e) => setNewOutput(e.target.value)}
               className="w-24 px-2 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-200 text-right font-mono"

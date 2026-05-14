@@ -120,7 +120,7 @@ export function Sessions() {
                                 : 'bg-yellow-500/10 text-yellow-400'
                         }`}
                       >
-                        {s.status}
+                        {t(s.status)}
                       </span>
                     </td>
                   </tr>
@@ -150,7 +150,7 @@ export function Sessions() {
                             : 'bg-yellow-500/10 text-yellow-400'
                     }`}
                   >
-                    {s.status}
+                    {t(s.status)}
                   </span>
                 </div>
                 <div className="text-xs text-gray-500 space-y-1">

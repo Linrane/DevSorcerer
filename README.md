@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.3.0-purple" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.3.1-purple" alt="Version">
   <img src="https://img.shields.io/badge/node-%3E%3D22-green" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/dashboard-react%2019-61dafb" alt="React 19">
@@ -195,12 +195,30 @@ node scripts/import-sessions.mjs --watch
 - Reads `~/.claude/projects/<project>/<session>.jsonl` files
 - Extracts tool calls, token usage, model info, and session metadata
 - Idempotent: re-running only imports new sessions, won't duplicate
+- Watch mode: auto-imports new sessions every 30 seconds
 
 **Dashboard will show:**
 - All Claude Code sessions with agent version, branch, status
 - Step-by-step timeline replay of tool calls
 - Cost breakdown by tool, model, and session
 - Token usage trends over time
+
+### v0.3.0 Highlights
+
+**Per-Model Pricing Engine**
+Every API call is priced by its actual model — Claude Opus vs Sonnet vs DeepSeek each have their own accurate rates. Costs are no longer estimates: they reflect real API pricing.
+
+**User-Configurable Pricing (Settings page)**
+Go to **Settings > Model Pricing** to customize rates for any model. Add new models, edit input/output prices per 1,000 tokens, see real-time cost previews. Made a mistake? One-click "Reset to Defaults" restores built-in pricing.
+
+**Per-Model Cost Breakdown**
+The **Cost Analysis** page now shows a separate "Per-Model Cost" table — toggle it on to see exactly which model consumed what budget, with percentage bars and call counts.
+
+**Foolproof Design**
+Every input validates before saving. Empty model names, negative prices, duplicate entries — all caught with clear error messages (in your language). The pricing reset button ensures you can always recover from misconfiguration.
+
+**Full Bilingual Support**
+Toggle between English and Chinese (Settings > Language). Every label, button, tooltip, error message, and chart axis switches. Technical identifiers (model names, file paths) are preserved.
 
 ### CLI Commands
 
@@ -222,15 +240,15 @@ node scripts/import-sessions.mjs --watch
 
 | Page | What You See |
 |---|---|
-| **Overview** | Live stats, cost trend, top tools |
-| **Sessions** | All sessions with search |
-| **Session Detail** | Step-by-step timeline replay player |
-| **Cost Analysis** | Time range filter, per-tool cost table |
-| **Risk Findings** | Severity breakdown, per-finding detail |
-| **Quality** | Acceptance rate, rollbacks, AI bugs |
-| **Knowledge** | Semantic + keyword hybrid search |
-| **Audit** | One-click JSON/CSV/NDJSON export |
-| **Settings** | Port, DB path, model, toggles |
+| **Overview** | Live stats, cost trend chart, top tools pie, recent sessions |
+| **Sessions** | All sessions with search by ID/agent/branch |
+| **Session Detail** | Step-by-step timeline replay player, tool call summary, error loops |
+| **Cost Analysis** | Time range filter (7d/30d/90d/all), per-tool & per-model cost tables, summary stats |
+| **Risk Findings** | Severity breakdown bar, per-finding detail with code snippets |
+| **Quality** | Acceptance rate, rollbacks, AI bugs, quality radar chart |
+| **Knowledge** | Semantic + keyword hybrid search with context snippets |
+| **Audit** | One-click JSON/CSV/NDJSON export, optional anonymization |
+| **Settings** | Port, DB path, embedding model, toggles, **model pricing editor** with validation |
 
 ### Architecture
 
@@ -452,12 +470,30 @@ node scripts/import-sessions.mjs --watch
 - 读取 `~/.claude/projects/<project>/<session>.jsonl` 文件
 - 提取工具调用、token 用量、模型信息和会话元数据
 - 幂等操作：重复运行只导入新会话，不会重复
+- 监控模式：每 30 秒自动检查并导入新会话
 
 **仪表盘将显示：**
 - 所有 Claude Code 会话（含版本、分支、状态）
 - 逐步时间线回放工具调用
 - 按工具、模型、会话的成本明细
 - 时间段内 token 用量趋势
+
+### v0.3.0 核心升级
+
+**按模型精确计价引擎**
+每个 API 调用按实际使用的模型计价 — Claude Opus、Sonnet、DeepSeek 各有独立准确的价格。成本不再是估算，而是反映真实的 API 开销。
+
+**用户可自定义定价（设置页面）**
+前往 **设置 > 模型定价**，即可为任意模型自定义费率。添加新模型、编辑每千 token 的输入/输出价格、实时查看成本预览。改错了？一键「重置为默认」恢复内置定价。
+
+**按模型成本分解**
+**成本分析** 页面新增独立的「各模型成本」表格 — 点击展开即可看到每种模型精确消耗了多少预算，含百分比进度条和调用次数。
+
+**防呆设计**
+每次保存前验证输入。空模型名、负数价格、重复条目 — 全都有清晰的错误提示（显示你当前语言）。定价重置按钮确保任何时候都能从错误配置中恢复。
+
+**完整双语支持**
+在设置 > 语言中一键切换英文/中文。每个标签、按钮、提示、错误消息、图表轴线都会切换。技术标识（模型名、文件路径）则保留不译。
 
 ### CLI 命令一览
 
@@ -479,15 +515,15 @@ node scripts/import-sessions.mjs --watch
 
 | 页面 | 你能看到 |
 |---|---|
-| **总览** | 实时统计、成本趋势图、热门工具排行 |
-| **会话列表** | 全部会话，支持搜索 |
-| **会话详情** | 逐步时间线回放播放器 |
-| **成本分析** | 按时间筛，工具级成本明细 |
-| **风险扫描** | 严重程度分布，每条风险详情 |
-| **质量** | 采纳率、回滚次数、AI 缺陷 |
-| **知识搜索** | 语义 + 关键词混合搜索 |
-| **审计导出** | 一键 JSON/CSV/NDJSON 导出 |
-| **设置** | 端口、数据库、模型、开关 |
+| **总览** | 实时统计卡片、成本趋势图、热门工具饼图、最近会话列表 |
+| **会话列表** | 全部会话，支持按 ID/代理/分支搜索 |
+| **会话详情** | 逐步时间线回放播放器、工具调用摘要、错误循环检测 |
+| **成本分析** | 时间范围筛选（7天/30天/90天/全部）、按工具 & 按模型成本表、汇总统计 |
+| **风险扫描** | 严重程度分布条，每条风险详情含代码片段 |
+| **质量** | 采纳率、回滚次数、AI 缺陷、质量雷达图 |
+| **知识搜索** | 语义 + 关键词混合搜索，带上下文片段 |
+| **审计导出** | 一键 JSON/CSV/NDJSON 导出，可选匿名化 |
+| **设置** | 端口、数据库路径、嵌入模型、开关、**模型定价编辑器**（含验证） |
 
 ### 架构
 

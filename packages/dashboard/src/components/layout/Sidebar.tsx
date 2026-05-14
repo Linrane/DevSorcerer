@@ -94,7 +94,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Footer */}
         <div className="px-4 py-3 border-t border-gray-800 flex-shrink-0">
-          <span className="text-xs text-gray-600">DevSorcerer v0.2.2</span>
+          <span className="text-xs text-gray-600">DevSorcerer v0.3.1</span>
         </div>
       </aside>
     </>

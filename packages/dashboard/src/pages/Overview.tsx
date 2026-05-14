@@ -169,7 +169,7 @@ export function Overview() {
                               : 'bg-yellow-500/10 text-yellow-400'
                         }`}
                       >
-                        {s.status}
+                        {t(s.status)}
                       </span>
                     </td>
                   </tr>

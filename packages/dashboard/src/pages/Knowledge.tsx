@@ -85,7 +85,7 @@ export function Knowledge() {
       {data && (
         <div>
           <p className="text-sm text-gray-500 mb-4">
-            {data.results.length} {data.results.length !== 1 ? t('results') : t('result')} in {data.tookMs}ms
+            {data.results.length} {data.results.length !== 1 ? t('results') : t('result')} {t('in')} {data.tookMs}ms
           </p>
           <div className="space-y-4">
             {data.results.map((result: SearchResult, i: number) => (

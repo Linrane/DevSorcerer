@@ -1,11 +1,13 @@
 import type { TimelineStep } from '../../api/client';
 import { Wrench, AlertCircle, ChevronRight } from 'lucide-react';
+import { useT } from '../../i18n';
 
 interface TimelineViewProps {
   steps: TimelineStep[];
 }
 
 export function TimelineView({ steps }: TimelineViewProps) {
+  const { t } = useT();
   const visible = steps.filter((s) => s.toolName).slice(-30);
 
   return (
@@ -39,7 +41,7 @@ export function TimelineView({ steps }: TimelineViewProps) {
                 <span className="text-xs font-medium text-gray-300">{step.toolName}</span>
                 {step.isError && (
                   <span className="flex items-center gap-1 text-xs text-red-400">
-                    <AlertCircle size={12} /> Error
+                    <AlertCircle size={12} /> {t('Error')}
                   </span>
                 )}
               </div>

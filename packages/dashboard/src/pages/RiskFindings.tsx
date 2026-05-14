@@ -156,7 +156,7 @@ export function RiskFindings() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`text-xs font-medium px-2 py-0.5 rounded ${config.bg} ${config.color}`}>
-                          {f.severity.toUpperCase()}
+                          {config.label}
                         </span>
                         <span className="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded">
                           {f.category}

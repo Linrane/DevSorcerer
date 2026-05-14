@@ -80,7 +80,7 @@ export function SessionReplay({ steps }: SessionReplayProps) {
                 key={i}
                 className="absolute top-0 w-1 h-full bg-red-500"
                 style={{ left: `${(i / Math.max(stepCount - 1, 1)) * 100}%` }}
-                title={`Error at step ${i + 1}`}
+                title={t('Error at step {n}', { n: i + 1 })}
               />
             ) : null,
           )}
