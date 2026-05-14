@@ -8,6 +8,22 @@ export interface GitContext {
   remoteUrl?: string;
 }
 
+function getGitDir(gitRoot: string): string {
+  const gitPath = path.join(gitRoot, '.git');
+  const stat = fs.statSync(gitPath);
+
+  // Worktree: .git is a file containing the path to the actual git dir
+  if (stat.isFile()) {
+    const content = fs.readFileSync(gitPath, 'utf-8').trim();
+    const match = content.match(/^gitdir:\s*(.+)$/m);
+    if (match?.[1]) {
+      return path.resolve(gitRoot, match[1]);
+    }
+  }
+
+  return gitPath;
+}
+
 export function detectGitContext(cwd: string): GitContext | null {
   const gitRoot = findGitRoot(cwd);
   if (!gitRoot) return null;
@@ -15,7 +31,8 @@ export function detectGitContext(cwd: string): GitContext | null {
   const context: GitContext = { rootPath: gitRoot };
 
   try {
-    const headPath = path.join(gitRoot, '.git', 'HEAD');
+    const gitDir = getGitDir(gitRoot);
+    const headPath = path.join(gitDir, 'HEAD');
     const headContent = fs.readFileSync(headPath, 'utf-8').trim();
 
     if (headContent.startsWith('ref: ')) {
@@ -24,8 +41,8 @@ export function detectGitContext(cwd: string): GitContext | null {
       context.commitHash = headContent;
     }
 
-    // Try to get remote URL from .git/config
-    const configPath = path.join(gitRoot, '.git', 'config');
+    // Try to get remote URL from git config
+    const configPath = path.join(gitDir, 'config');
     if (fs.existsSync(configPath)) {
       const configContent = fs.readFileSync(configPath, 'utf-8');
       const urlMatch = configContent.match(/url\s*=\s*(.+)/);

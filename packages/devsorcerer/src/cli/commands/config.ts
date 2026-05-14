@@ -1,5 +1,6 @@
 import { Command, Option } from 'clipanion';
 import { loadConfig, saveConfig } from '../../config/loader.js';
+import { sanitizeConfigKey, validatePort } from '../../shared/validation.js';
 
 export class ConfigShowCommand extends Command {
   static override paths = [['config', 'show']];
@@ -27,12 +28,27 @@ export class ConfigSetCommand extends Command {
 
   async execute(): Promise<number> {
     try {
-      const parsed = JSON.parse(this.value);
+      sanitizeConfigKey(this.key);
+      let parsed: unknown = this.value;
+      try {
+        parsed = JSON.parse(this.value);
+      } catch {
+        // Keep as raw string if not valid JSON
+      }
+
+      // Extra validation for serverPort
+      if (this.key === 'serverPort') {
+        validatePort(parsed, 'serverPort');
+      }
+
       saveConfig({ [this.key]: parsed });
-    } catch {
-      saveConfig({ [this.key]: this.value } as Partial<Record<string, unknown>> as never);
+      this.context.stdout.write(`Config updated: ${this.key} = ${this.value}\n`);
+    } catch (err) {
+      this.context.stderr.write(
+        `Error: ${err instanceof Error ? err.message : String(err)}\n`,
+      );
+      return 1;
     }
-    this.context.stdout.write(`Config updated: ${this.key} = ${this.value}\n`);
     return 0;
   }
 }
@@ -44,10 +60,18 @@ export class ConfigGetCommand extends Command {
   key = Option.String({ required: true, name: 'key' });
 
   async execute(): Promise<number> {
+    try {
+      sanitizeConfigKey(this.key);
+    } catch (err) {
+      this.context.stderr.write(
+        `Error: ${err instanceof Error ? err.message : String(err)}\n`,
+      );
+      return 1;
+    }
     const config = loadConfig();
     const value = (config as Record<string, unknown>)[this.key];
     if (value === undefined) {
-      this.context.stdout.write(`Key not found: ${this.key}\n`);
+      this.context.stderr.write(`Error: Key not found: ${this.key}\n`);
       return 1;
     }
     this.context.stdout.write(JSON.stringify(value) + '\n');

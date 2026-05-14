@@ -31,9 +31,17 @@ export async function knowledgeRoutes(app: FastifyInstance): Promise<void> {
     };
 
     const searchQuery = query.q || query.query;
-    if (!searchQuery) {
+    if (!searchQuery || searchQuery.trim().length === 0) {
       reply.code(400);
       return { error: 'Missing query parameter "q" or "query"' };
+    }
+    if (searchQuery.length > 500) {
+      reply.code(400);
+      return { error: 'Query too long (max 500 characters)' };
+    }
+    if (query.limit && (parseInt(query.limit, 10) < 1 || parseInt(query.limit, 10) > 500)) {
+      reply.code(400);
+      return { error: 'Limit must be between 1 and 500' };
     }
 
     try {

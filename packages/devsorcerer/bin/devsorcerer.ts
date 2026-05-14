@@ -19,11 +19,12 @@ import {
   ConfigGetCommand,
   ConfigResetCommand,
 } from '../src/cli/commands/config.js';
+import { ValidateCommand } from '../src/cli/commands/validate.js';
 
 const cli = new Cli({
   binaryLabel: 'DevSorcerer',
   binaryName: 'devsorcerer',
-  binaryVersion: '0.1.0',
+  binaryVersion: '0.2.0',
 });
 
 // Register all commands
@@ -42,5 +43,6 @@ cli.register(ConfigShowCommand);
 cli.register(ConfigSetCommand);
 cli.register(ConfigGetCommand);
 cli.register(ConfigResetCommand);
+cli.register(ValidateCommand);
 
 cli.runExit(process.argv.slice(2));

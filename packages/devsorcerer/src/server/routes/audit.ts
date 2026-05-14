@@ -18,6 +18,18 @@ export async function auditRoutes(app: FastifyInstance): Promise<void> {
       (query.format as AuditExportFormat) || 'json';
     const scope: AuditAnonymizeScope =
       (query.scope as AuditAnonymizeScope) || 'full';
+
+    const validFormats = ['csv', 'json', 'ndjson'];
+    const validScopes = ['full', 'anonymized'];
+    if (query.format && !validFormats.includes(query.format)) {
+      reply.code(400);
+      return { error: `Invalid format. Must be one of: ${validFormats.join(', ')}` };
+    }
+    if (query.scope && !validScopes.includes(query.scope)) {
+      reply.code(400);
+      return { error: `Invalid scope. Must be one of: ${validScopes.join(', ')}` };
+    }
+
     const anonymize = scope === 'anonymized';
 
     const db = getDb();

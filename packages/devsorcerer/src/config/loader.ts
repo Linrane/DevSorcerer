@@ -44,7 +44,7 @@ export function loadConfig(projectRoot?: string): DevSorcererConfig {
   // 3. Environment variables: DEVSO_<KEY>
   for (const [envKey, envVal] of Object.entries(process.env)) {
     if (!envKey.startsWith('DEVSO_')) continue;
-    const key = envKey.slice(6).replace(/_([a-z])/g, (_, c: string) =>
+    const key = envKey.slice(6).replace(/_([a-zA-Z])/g, (_, c: string) =>
       c.toUpperCase(),
     );
     const lowerKey =
@@ -73,8 +73,9 @@ export function saveConfig(
   updates: Partial<DevSorcererConfig>,
   projectRoot?: string,
 ): DevSorcererConfig {
-  const current = loadConfig(projectRoot);
-  const merged = { ...current, ...updates };
+  // If updates is empty, reset to defaults
+  const base = Object.keys(updates).length === 0 ? { ...defaultConfig } : loadConfig(projectRoot);
+  const merged = { ...base, ...updates };
   const result = ConfigSchema.safeParse(merged);
   if (!result.success) {
     throw new Error(`Invalid config: ${result.error}`);
@@ -89,7 +90,7 @@ export function saveConfig(
   return cachedConfig;
 }
 
-export function getConfig(key: keyof DevSorcererConfig): unknown {
+export function getConfig<K extends keyof DevSorcererConfig>(key: K): DevSorcererConfig[K] {
   return loadConfig()[key];
 }
 

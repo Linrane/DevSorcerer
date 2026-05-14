@@ -2,6 +2,7 @@ import { Command, Option } from 'clipanion';
 import { loadConfig } from '../../config/loader.js';
 import { initDb } from '../../storage/db.js';
 import { startServer } from '../../server/app.js';
+import { validatePort } from '../../shared/validation.js';
 
 export class StartCommand extends Command {
   static override paths = [['start']];
@@ -15,7 +16,7 @@ export class StartCommand extends Command {
 
   async execute(): Promise<number> {
     const config = loadConfig();
-    const port = this.port ? parseInt(this.port, 10) : config.serverPort;
+    const port = this.port ? validatePort(this.port, 'port') : config.serverPort;
 
     this.context.stdout.write(`DevSorcerer v0.2.0 starting...\n`);
 

@@ -3,6 +3,13 @@ import fs from 'node:fs';
 import { loadConfig } from '../../config/loader.js';
 import { initDb, getDb } from '../../storage/db.js';
 import type { AuditExportFormat, AuditAnonymizeScope } from '../../shared/types.js';
+import {
+  validateProjectId,
+  validateDateFormat,
+  validateAuditFormat,
+  validateAuditScope,
+  validateOutputPath,
+} from '../../shared/validation.js';
 
 export class AuditExportCommand extends Command {
   static override paths = [['audit', 'export']];
@@ -26,8 +33,14 @@ export class AuditExportCommand extends Command {
     const db = initDb(config.dbPath);
 
     try {
+      if (this.project) validateProjectId(this.project);
+      if (this.from) validateDateFormat(this.from, '--from');
+      if (this.to) validateDateFormat(this.to, '--to');
       const format: AuditExportFormat = (this.format as AuditExportFormat) || 'json';
       const scope: AuditAnonymizeScope = (this.scope as AuditAnonymizeScope) || 'full';
+      if (this.format) validateAuditFormat(this.format);
+      if (this.scope) validateAuditScope(this.scope);
+      if (this.output) validateOutputPath(this.output);
       const anonymize = scope === 'anonymized';
 
       let sql = `

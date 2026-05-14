@@ -21,7 +21,7 @@ export async function statusRoutes(app: FastifyInstance): Promise<void> {
 
     return {
       status: 'running',
-      version: '0.1.0',
+      version: '0.2.0',
       uptime: Math.floor(process.uptime()),
       collector: {
         active: false, // Updated when collector is running

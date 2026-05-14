@@ -10,6 +10,7 @@ import('../dist/cli/root.js').then(async ({ RootCommand }) => {
   const { AuditExportCommand } = await import('../dist/cli/commands/audit.js');
   const { KnowledgeSearchCommand } = await import('../dist/cli/commands/knowledge.js');
   const { ConfigShowCommand, ConfigSetCommand, ConfigGetCommand, ConfigResetCommand } = await import('../dist/cli/commands/config.js');
+  const { ValidateCommand } = await import('../dist/cli/commands/validate.js');
 
   const cli = new Cli({
     binaryLabel: 'DevSorcerer',
@@ -32,6 +33,7 @@ import('../dist/cli/root.js').then(async ({ RootCommand }) => {
   cli.register(ConfigSetCommand);
   cli.register(ConfigGetCommand);
   cli.register(ConfigResetCommand);
+  cli.register(ValidateCommand);
 
   cli.runExit(process.argv.slice(2));
 });

@@ -200,12 +200,13 @@ export class LanceDBVectorStore implements VectorStore {
 
   async deleteBySession(_sessionId: string): Promise<void> {
     if (!this.connected) return;
-    // LanceDB delete by filter
     const table = this.table as {
       delete: (predicate: string) => Promise<void>;
     };
     try {
-      await table.delete(`session_id = '${_sessionId}'`);
+      // Sanitize: session IDs are generated UUIDs, but guard against injection
+      const safe = _sessionId.replace(/'/g, "''");
+      await table.delete(`session_id = '${safe}'`);
     } catch {
       // Best effort
     }
@@ -220,5 +221,6 @@ export class LanceDBVectorStore implements VectorStore {
 
 // Factory
 export function createVectorStore(type: 'memory' | 'lancedb' = 'memory'): VectorStore {
+  if (type === 'lancedb') return new LanceDBVectorStore();
   return new MemoryVectorStore();
 }

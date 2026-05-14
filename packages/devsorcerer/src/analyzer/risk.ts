@@ -63,9 +63,7 @@ export class RiskAnalyzer {
     projectId: string,
     minSeverity?: RiskSeverity,
   ): RiskFinding[] {
-    // Get findings for all sessions in project via DB
     const findings = getCachedFindings(undefined, undefined);
-    // Filter by severity if requested
     if (minSeverity) {
       const severityOrder: RiskSeverity[] = ['critical', 'high', 'medium', 'low'];
       const minIdx = severityOrder.indexOf(minSeverity);

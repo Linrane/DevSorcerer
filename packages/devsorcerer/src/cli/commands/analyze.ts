@@ -5,6 +5,12 @@ import { CostAnalyzer } from '../../analyzer/cost.js';
 import { RiskAnalyzer } from '../../analyzer/risk.js';
 import { QualityAnalyzer } from '../../analyzer/quality.js';
 import type { RiskSeverity } from '../../shared/types.js';
+import {
+  validateSessionId,
+  validateProjectId,
+  validateDateFormat,
+  validateSeverity,
+} from '../../shared/validation.js';
 
 export class AnalyzeCostCommand extends Command {
   static override paths = [['analyze', 'cost']];
@@ -25,6 +31,18 @@ export class AnalyzeCostCommand extends Command {
   groupBy = Option.String('--group-by', { description: 'Aggregation: tool, session, day' });
 
   async execute(): Promise<number> {
+    if (!this.session && !this.project) {
+      this.context.stderr.write('Error: --session or --project is required.\n');
+      this.context.stderr.write('Usage: devsorcerer analyze cost --project <name> or --session <id>\n');
+      this.context.stderr.write('Run with --help for full options.\n');
+      return 1;
+    }
+
+    if (this.session) validateSessionId(this.session);
+    if (this.project) validateProjectId(this.project);
+    if (this.from) validateDateFormat(this.from, '--from');
+    if (this.to) validateDateFormat(this.to, '--to');
+
     const config = loadConfig();
     const db = initDb(config.dbPath);
     const analyzer = new CostAnalyzer(config.pricing);
@@ -53,10 +71,6 @@ export class AnalyzeCostCommand extends Command {
             );
           }
         }
-      } else {
-        this.context.stdout.write('Usage: devsorcerer analyze cost --project <name> or --session <id>\n');
-        this.context.stdout.write('Run with --help for full options.\n');
-        return 1;
       }
     } finally {
       db.close();
@@ -83,6 +97,16 @@ export class AnalyzeRiskCommand extends Command {
   format = Option.String('--format', { description: 'Output: table, json, sarif' });
 
   async execute(): Promise<number> {
+    if (!this.session && !this.project) {
+      this.context.stderr.write('Error: --session or --project is required.\n');
+      this.context.stderr.write('Usage: devsorcerer analyze risk --session <id> or --project <name>\n');
+      return 1;
+    }
+
+    if (this.session) validateSessionId(this.session);
+    if (this.project) validateProjectId(this.project);
+    if (this.severity) validateSeverity(this.severity);
+
     const config = loadConfig();
     const db = initDb(config.dbPath);
     const analyzer = new RiskAnalyzer();
@@ -122,9 +146,6 @@ export class AnalyzeRiskCommand extends Command {
             );
           }
         }
-      } else {
-        this.context.stdout.write('Usage: devsorcerer analyze risk --session <id> or --project <name>\n');
-        return 1;
       }
     } finally {
       db.close();
@@ -144,7 +165,7 @@ export class AnalyzeRiskCommand extends Command {
             tool: {
               driver: {
                 name: 'DevSorcerer',
-                version: '0.1.0',
+                version: '0.2.0',
                 rules: [...new Set(report.findings.map((f) => f.ruleId))].map((id) => ({ id, name: id })),
               },
             },
@@ -183,6 +204,17 @@ export class AnalyzeQualityCommand extends Command {
   format = Option.String('--format', { description: 'Output: table, json' });
 
   async execute(): Promise<number> {
+    if (!this.session && !this.project) {
+      this.context.stderr.write('Error: --session or --project is required.\n');
+      this.context.stderr.write('Usage: devsorcerer analyze quality --session <id> or --project <name>\n');
+      return 1;
+    }
+
+    if (this.session) validateSessionId(this.session);
+    if (this.project) validateProjectId(this.project);
+    if (this.from) validateDateFormat(this.from, '--from');
+    if (this.to) validateDateFormat(this.to, '--to');
+
     const config = loadConfig();
     const db = initDb(config.dbPath);
     const analyzer = new QualityAnalyzer();
@@ -217,9 +249,6 @@ export class AnalyzeQualityCommand extends Command {
           this.context.stdout.write(`Rollback Rate: ${quality.rollbackRate.toFixed(1)}%\n`);
           this.context.stdout.write(`AI Bug Rate: ${quality.aiBugRate.toFixed(1)}%\n`);
         }
-      } else {
-        this.context.stdout.write('Usage: devsorcerer analyze quality --session <id> or --project <name>\n');
-        return 1;
       }
     } finally {
       db.close();

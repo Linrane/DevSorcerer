@@ -42,6 +42,12 @@ export class ProxyCommand extends Command {
   });
 
   async execute(): Promise<number> {
+    if (!this.target) {
+      this.context.stderr.write('Error: --target <command> is required.\n');
+      this.context.stderr.write('Example: devsorcerer proxy -t npx --target-args -y @anthropic/mcp-server-filesystem .\n');
+      return 1;
+    }
+
     const projectRoot = this.projectRoot || process.cwd();
     const config = loadConfig(projectRoot);
 
@@ -62,7 +68,7 @@ export class ProxyCommand extends Command {
     });
 
     this.context.stdout.write(
-      `DevSorcerer MCP Proxy v0.1.0\n`,
+      `DevSorcerer MCP Proxy v0.2.0\n`,
     );
 
     if (this.targetUrl) {

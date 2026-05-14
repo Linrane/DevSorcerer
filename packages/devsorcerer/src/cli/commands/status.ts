@@ -1,6 +1,6 @@
 import { Command } from 'clipanion';
 import { loadConfig } from '../../config/loader.js';
-import { getDb } from '../../storage/db.js';
+import { initDb } from '../../storage/db.js';
 
 export class StatusCommand extends Command {
   static override paths = [['status']];
@@ -15,7 +15,7 @@ export class StatusCommand extends Command {
     this.context.stdout.write('==================\n\n');
 
     try {
-      const db = getDb();
+      const db = initDb(config.dbPath);
       const sessions = db.prepare('SELECT COUNT(*) as c FROM sessions').get() as { c: number };
       const events = db.prepare('SELECT COUNT(*) as c FROM events').get() as { c: number };
       const projects = db.prepare('SELECT COUNT(*) as c FROM projects').get() as { c: number };
@@ -32,8 +32,9 @@ export class StatusCommand extends Command {
       this.context.stdout.write(`Sessions: ${sessions.c} (${activeSessions.c} active)\n`);
       this.context.stdout.write(`Events:   ${events.c.toLocaleString()}\n`);
       this.context.stdout.write(`Total Cost: $${totalCost.c.toFixed(4)}\n`);
-    } catch {
-      this.context.stdout.write('Database not initialized. Run "devsorcerer start" first.\n');
+    } catch (err) {
+      this.context.stderr.write(`Database error: ${err instanceof Error ? err.message : String(err)}\n`);
+      this.context.stderr.write('Run "devsorcerer start" first to initialize the database.\n');
     }
 
     return 0;

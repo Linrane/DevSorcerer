@@ -86,12 +86,12 @@ export class BottleneckAnalyzer {
   private classifyErrorPattern(
     occurrences: CapturedEvent[],
   ): ErrorLoopPattern {
-    // Check if arguments are identical across all attempts
-    const args = occurrences.map((e) => JSON.stringify(e.params));
-    const uniqueArgs = new Set(args);
+    // Compare error messages to classify the loop pattern
+    const msgs = occurrences.map((e) => e.error?.message || 'Unknown error');
+    const uniqueMsgs = new Set(msgs);
 
-    if (uniqueArgs.size === 1) return 'duplicate-params';
-    if (uniqueArgs.size === 2) return 'oscillating';
+    if (uniqueMsgs.size === 1) return 'duplicate-params';
+    if (uniqueMsgs.size === 2) return 'oscillating';
     return 'incremental-fix';
   }
 

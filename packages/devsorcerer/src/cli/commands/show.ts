@@ -26,13 +26,20 @@ export class ShowCommand extends Command {
   format = Option.String('--format', { description: 'Output: text, json' });
 
   async execute(): Promise<number> {
+    if (!this.sessionId || this.sessionId.length < 1) {
+      this.context.stderr.write('Error: a valid session ID is required.\n');
+      this.context.stderr.write('Usage: devsorcerer show <session-id> [--timeline|--chain|--errors]\n');
+      return 1;
+    }
+
     const config = loadConfig();
     const db = initDb(config.dbPath);
 
     try {
       const session = getSession(this.sessionId);
       if (!session) {
-        this.context.stdout.write(`Session not found: ${this.sessionId}\n`);
+        this.context.stderr.write(`Error: Session not found: ${this.sessionId}\n`);
+        this.context.stderr.write('Run "devsorcerer status" to see available sessions.\n');
         return 1;
       }
 
