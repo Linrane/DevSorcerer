@@ -68,7 +68,7 @@ export class ProxyCommand extends Command {
     });
 
     this.context.stdout.write(
-      `DevSorcerer MCP Proxy v0.3.1\n`,
+      `DevSorcerer MCP Proxy v0.3.2\n`,
     );
 
     if (this.targetUrl) {

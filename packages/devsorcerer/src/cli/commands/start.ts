@@ -19,7 +19,7 @@ export class StartCommand extends Command {
     const config = loadConfig();
     const port = this.port ? validatePort(this.port, 'port') : config.serverPort;
 
-    this.context.stdout.write(`DevSorcerer v0.3.1 starting...\n`);
+    this.context.stdout.write(`DevSorcerer v0.3.2 starting...\n`);
 
     // Initialize database
     initDb(config.dbPath);
