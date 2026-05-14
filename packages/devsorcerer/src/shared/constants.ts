@@ -10,15 +10,29 @@ export const CHUNK_OVERLAP_CHARS = 200;
 export const KNOWLEDGE_SEARCH_DEFAULT_LIMIT = 10;
 export const WEBSOCKET_PATH = '/ws/live';
 
+// Single source of truth for model pricing.
+// Users can override via Settings → Pricing Editor or .devsorcerer.json.
 export const DEFAULT_PRICING: PricingTable = {
-  'claude-sonnet-4-20250514': { inputPer1k: 0.003, outputPer1k: 0.015 },
-  'claude-opus-4-20250514': { inputPer1k: 0.015, outputPer1k: 0.075 },
-  'claude-haiku-4-5-20251001': { inputPer1k: 0.001, outputPer1k: 0.005 },
-  'gpt-4o': { inputPer1k: 0.005, outputPer1k: 0.015 },
-  'gpt-4.1': { inputPer1k: 0.003, outputPer1k: 0.024 },
-  'gpt-5': { inputPer1k: 0.01, outputPer1k: 0.04 },
-  'deepseek-v4': { inputPer1k: 0.0015, outputPer1k: 0.006 },
-  default: { inputPer1k: 0.005, outputPer1k: 0.02 },
+  // Anthropic Claude (per 1k tokens, USD)
+  'claude-opus-4-7':            { inputPer1k: 0.015,  outputPer1k: 0.075 },
+  'claude-sonnet-4-6':          { inputPer1k: 0.003,  outputPer1k: 0.015 },
+  'claude-haiku-4-5-20251001':  { inputPer1k: 0.001,  outputPer1k: 0.005 },
+  'claude-opus-4-20250514':     { inputPer1k: 0.015,  outputPer1k: 0.075 },
+  'claude-sonnet-4-20250514':   { inputPer1k: 0.003,  outputPer1k: 0.015 },
+
+  // OpenAI (per 1k tokens, USD)
+  'gpt-4o':                     { inputPer1k: 0.005,  outputPer1k: 0.015 },
+  'gpt-4.1':                    { inputPer1k: 0.003,  outputPer1k: 0.024 },
+  'gpt-5':                      { inputPer1k: 0.01,   outputPer1k: 0.04 },
+
+  // DeepSeek (per 1k tokens, USD)
+  'deepseek-v4-pro':            { inputPer1k: 0.00055,outputPer1k: 0.00219 },
+  'deepseek-v4':                { inputPer1k: 0.0015, outputPer1k: 0.006 },
+  'deepseek-v3':                { inputPer1k: 0.00027,outputPer1k: 0.0011 },
+  'deepseek-r1':                { inputPer1k: 0.00055,outputPer1k: 0.00219 },
+
+  // Fallback — used when model doesn't match any key above
+  default:                      { inputPer1k: 0.003,  outputPer1k: 0.015 },
 };
 
 export const MCP_METHODS = {

@@ -17,6 +17,7 @@ import { createInterface } from 'node:readline';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import os from 'node:os';
+import fs from 'node:fs';
 
 // ── Config ────────────────────────────────────────────────────
 const PROJECT_DIR =
@@ -24,14 +25,38 @@ const PROJECT_DIR =
 const DB_PATH = `${PROJECT_DIR}/.vault/devsorcerer.sqlite`;
 const SESSIONS_DIR = `${os.homedir()}/.claude/projects/d--LInranesLittleBox-WorkingAndLearning-PersonalProject-DevTwin`;
 
-// ── Pricing (USD per 1k tokens) ───────────────────────────────
-const PRICING = {
-  'deepseek-v4-pro': { inputPer1k: 0.00055, outputPer1k: 0.00219 },
-  'claude-opus-4-7': { inputPer1k: 0.015, outputPer1k: 0.075 },
-  'claude-sonnet-4-6': { inputPer1k: 0.003, outputPer1k: 0.015 },
-  'claude-haiku-4-5': { inputPer1k: 0.001, outputPer1k: 0.005 },
-  default: { inputPer1k: 0.003, outputPer1k: 0.015 },
+// ── Default pricing (USD per 1k tokens) ───────────────────────
+const DEFAULT_PRICING = {
+  'claude-opus-4-7':           { inputPer1k: 0.015,  outputPer1k: 0.075 },
+  'claude-sonnet-4-6':         { inputPer1k: 0.003,  outputPer1k: 0.015 },
+  'claude-haiku-4-5-20251001': { inputPer1k: 0.001,  outputPer1k: 0.005 },
+  'claude-opus-4-20250514':    { inputPer1k: 0.015,  outputPer1k: 0.075 },
+  'claude-sonnet-4-20250514':  { inputPer1k: 0.003,  outputPer1k: 0.015 },
+  'gpt-4o':                    { inputPer1k: 0.005,  outputPer1k: 0.015 },
+  'gpt-4.1':                   { inputPer1k: 0.003,  outputPer1k: 0.024 },
+  'gpt-5':                     { inputPer1k: 0.01,   outputPer1k: 0.04 },
+  'deepseek-v4-pro':           { inputPer1k: 0.00055,outputPer1k: 0.00219 },
+  'deepseek-v4':               { inputPer1k: 0.0015, outputPer1k: 0.006 },
+  'deepseek-v3':               { inputPer1k: 0.00027,outputPer1k: 0.0011 },
+  'deepseek-r1':               { inputPer1k: 0.00055,outputPer1k: 0.00219 },
+  default:                     { inputPer1k: 0.003,  outputPer1k: 0.015 },
 };
+
+// Load user-customized pricing from DevTwin config
+function loadPricing() {
+  const configPath = path.join(PROJECT_DIR, '.devsorcerer.json');
+  try {
+    if (fs.existsSync(configPath)) {
+      const cfg = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      if (cfg.pricing && Object.keys(cfg.pricing).length > 0) {
+        return { ...DEFAULT_PRICING, ...cfg.pricing };
+      }
+    }
+  } catch { /* use defaults */ }
+  return DEFAULT_PRICING;
+}
+
+const PRICING = loadPricing();
 
 function uuid() {
   const hex = Array.from({ length: 32 }, () =>
@@ -51,7 +76,14 @@ function estimateTokens(str) {
 }
 
 function getPricing(model) {
-  return PRICING[model] || PRICING.default;
+  if (!model) return PRICING.default || { inputPer1k: 0.003, outputPer1k: 0.015 };
+  if (PRICING[model]) return PRICING[model];
+  // Try prefix match
+  const keys = Object.keys(PRICING).filter(k => k !== 'default');
+  for (const key of keys) {
+    if (model.startsWith(key) || key.startsWith(model)) return PRICING[key];
+  }
+  return PRICING.default || { inputPer1k: 0.003, outputPer1k: 0.015 };
 }
 
 // ── Main ──────────────────────────────────────────────────────

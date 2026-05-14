@@ -165,7 +165,7 @@ export class AnalyzeRiskCommand extends Command {
             tool: {
               driver: {
                 name: 'DevSorcerer',
-                version: '0.2.3',
+                version: '0.3.0',
                 rules: [...new Set(report.findings.map((f) => f.ruleId))].map((id) => ({ id, name: id })),
               },
             },

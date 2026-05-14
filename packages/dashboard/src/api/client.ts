@@ -142,6 +142,13 @@ export function updateSettings(settings: Record<string, unknown>) {
   });
 }
 
+export function resetPricing() {
+  return fetchAPI<{ success: boolean; pricing: Record<string, { inputPer1k: number; outputPer1k: number }> }>(
+    '/settings/pricing/reset',
+    { method: 'POST' },
+  );
+}
+
 // Types (mirror from backend)
 export interface Session {
   id: string;
@@ -195,6 +202,7 @@ export interface ProjectCost {
   totalCost: number;
   dailyCosts: { date: string; tokens: number; cost: number; sessionCount: number }[];
   toolBreakdown: { toolName: string; callCount: number; tokensIn: number; tokensOut: number; cost: number }[];
+  modelBreakdown: { model: string; callCount: number; tokensIn: number; tokensOut: number; cost: number }[];
 }
 
 export interface RiskFinding {

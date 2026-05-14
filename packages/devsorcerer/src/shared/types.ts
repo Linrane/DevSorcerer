@@ -117,6 +117,7 @@ export interface ProjectCost {
   totalCost: number;
   dailyCosts: DailyCost[];
   toolBreakdown: ToolCostBreakdown[];
+  modelBreakdown: ModelCostBreakdown[];
 }
 
 export interface DailyCost {

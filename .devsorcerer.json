@@ -1,7 +1,63 @@
 {
-  "serverPort": 3199,
   "dbPath": "d:/LInranesLittleBox/WorkingAndLearning/PersonalProject/DevTwin/.vault/devsorcerer.sqlite",
   "lancedbPath": "d:/LInranesLittleBox/WorkingAndLearning/PersonalProject/DevTwin/.vault/lancedb",
-  "captureEnabled": true,
-  "dashboardEnabled": true
+  "serverPort": 3199,
+  "pricing": {
+    "claude-opus-4-7": {
+      "inputPer1k": 0.015,
+      "outputPer1k": 0.075
+    },
+    "claude-sonnet-4-6": {
+      "inputPer1k": 0.003,
+      "outputPer1k": 0.015
+    },
+    "claude-haiku-4-5-20251001": {
+      "inputPer1k": 0.001,
+      "outputPer1k": 0.005
+    },
+    "claude-opus-4-20250514": {
+      "inputPer1k": 0.015,
+      "outputPer1k": 0.075
+    },
+    "claude-sonnet-4-20250514": {
+      "inputPer1k": 0.003,
+      "outputPer1k": 0.015
+    },
+    "gpt-4o": {
+      "inputPer1k": 0.005,
+      "outputPer1k": 0.015
+    },
+    "gpt-4.1": {
+      "inputPer1k": 0.003,
+      "outputPer1k": 0.024
+    },
+    "gpt-5": {
+      "inputPer1k": 0.01,
+      "outputPer1k": 0.04
+    },
+    "deepseek-v4-pro": {
+      "inputPer1k": 0.00055,
+      "outputPer1k": 0.00219
+    },
+    "deepseek-v4": {
+      "inputPer1k": 0.0015,
+      "outputPer1k": 0.006
+    },
+    "deepseek-v3": {
+      "inputPer1k": 0.00027,
+      "outputPer1k": 0.0011
+    },
+    "deepseek-r1": {
+      "inputPer1k": 0.00055,
+      "outputPer1k": 0.00219
+    },
+    "default": {
+      "inputPer1k": 0.003,
+      "outputPer1k": 0.015
+    }
+  },
+  "embeddingModel": "Xenova/all-MiniLM-L6-v2",
+  "anonymizeExport": false,
+  "dashboardEnabled": true,
+  "captureEnabled": true
 }

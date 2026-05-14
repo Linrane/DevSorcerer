@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.2.3-purple" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.3.0-purple" alt="Version">
   <img src="https://img.shields.io/badge/node-%3E%3D22-green" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/dashboard-react%2019-61dafb" alt="React 19">
@@ -173,7 +173,7 @@ Add to your agent's MCP config:
 
 Compatible with: Claude Code, Cursor, Windsurf, Continue, Cline, Codex CLI, and any MCP agent.
 
-### Claude Code Session Monitoring (NEW in v0.2.3)
+### Claude Code Session Monitoring (NEW in v0.3.0)
 
 For Claude Code users, DevSorcerer now imports your actual session history directly — no MCP proxy needed. It reads Claude Code's native JSONL session files and populates the dashboard with real conversation data including tool calls, token usage, and costs.
 
@@ -430,7 +430,7 @@ devsorcerer start
 
 兼容：Claude Code、Cursor、Windsurf、Continue、Cline、Codex CLI 等所有 MCP agent。
 
-### Claude Code 会话监控（v0.2.3 新增）
+### Claude Code 会话监控（v0.3.0 新增）
 
 Claude Code 用户现在可以直接导入真实的会话历史 —— 无需 MCP 代理。DevSorcerer 读取 Claude Code 的原生 JSONL 会话文件，将工具调用、token 用量和成本等数据导入仪表盘。
 
