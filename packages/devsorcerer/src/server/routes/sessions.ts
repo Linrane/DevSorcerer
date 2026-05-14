@@ -9,8 +9,26 @@ import {
   getSessionEventsByTool,
 } from '../../storage/repositories/events.js';
 import { BottleneckAnalyzer } from '../../analyzer/bottleneck.js';
+import { importAllClaudeCodeSessions } from '../../import/sessionImporter.js';
 
 export async function sessionRoutes(app: FastifyInstance): Promise<void> {
+  // Import Claude Code sessions
+  app.post('/sessions/import', async (_request, reply) => {
+    try {
+      const results = importAllClaudeCodeSessions();
+      const imported = results.filter((r) => !r.skipped);
+      const skipped = results.filter((r) => r.skipped);
+      return {
+        total: results.length,
+        imported: imported.length,
+        skipped: skipped.length,
+        sessions: results,
+      };
+    } catch (err) {
+      reply.code(500);
+      return { error: 'Import failed', message: err instanceof Error ? err.message : 'Unknown error' };
+    }
+  });
   // List sessions
   app.get('/sessions', async (request, reply) => {
     const query = request.query as {

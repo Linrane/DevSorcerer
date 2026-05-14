@@ -3,6 +3,7 @@ import { loadConfig } from '../../config/loader.js';
 import { initDb } from '../../storage/db.js';
 import { startServer } from '../../server/app.js';
 import { validatePort } from '../../shared/validation.js';
+import { importAllClaudeCodeSessions } from '../../import/sessionImporter.js';
 
 export class StartCommand extends Command {
   static override paths = [['start']];
@@ -24,6 +25,28 @@ export class StartCommand extends Command {
     initDb(config.dbPath);
     this.context.stdout.write(`  Database: ${config.dbPath}\n`);
 
+    // Auto-import Claude Code sessions on startup
+    this.context.stdout.write('  Importing Claude Code sessions...\n');
+    try {
+      const results = importAllClaudeCodeSessions();
+      const imported = results.filter((r) => !r.skipped);
+      const skipped = results.filter((r) => r.skipped);
+      if (imported.length > 0) {
+        this.context.stdout.write(`  ✓ Imported ${imported.length} session(s)\n`);
+        for (const r of imported) {
+          this.context.stdout.write(`    - ${r.sessionId}: ${r.toolCalls} tool calls, $${r.totalCost.toFixed(4)}\n`);
+        }
+      }
+      if (skipped.length > 0) {
+        this.context.stdout.write(`  • Skipped ${skipped.length} already-imported session(s)\n`);
+      }
+      if (results.length === 0) {
+        this.context.stdout.write('  • No Claude Code sessions found\n');
+      }
+    } catch (err) {
+      this.context.stdout.write(`  ⚠ Session import failed: ${err instanceof Error ? err.message : 'Unknown error'}\n`);
+    }
+
     // Start API server
     const app = await startServer(port);
 
@@ -42,6 +65,7 @@ export class StartCommand extends Command {
     // Graceful shutdown
     const shutdown = async () => {
       this.context.stdout.write('\nShutting down...\n');
+      clearInterval(importInterval);
       await app.close();
       process.exit(0);
     };
@@ -50,6 +74,17 @@ export class StartCommand extends Command {
     process.on('SIGTERM', shutdown);
 
     this.context.stdout.write(`DevSorcerer is running. Press Ctrl+C to stop.\n`);
+
+    // Periodic auto-import: check for new Claude Code sessions every 5 minutes
+    const importInterval = setInterval(() => {
+      try {
+        const results = importAllClaudeCodeSessions();
+        const imported = results.filter((r) => !r.skipped);
+        if (imported.length > 0) {
+          this.context.stdout.write(`  ✓ Auto-imported ${imported.length} new session(s)\n`);
+        }
+      } catch { /* silent — don't crash on polling errors */ }
+    }, 5 * 60 * 1000);
 
     // Keep process alive
     await new Promise(() => {});

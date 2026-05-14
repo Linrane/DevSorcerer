@@ -9,10 +9,16 @@ import { useT } from '../../i18n';
 export function CostTrendChart() {
   const { t } = useT();
 
-  // Primary: use cost analysis API for accurate daily cost data
   const { data: costData, isLoading } = useQuery({
     queryKey: ['cost', 'all', 'all', 'cost-trend'],
     queryFn: () => getCostAnalysis({ project_id: 'all' }),
+  });
+
+  // Always call hooks at top level — never conditional
+  const { data: sessionsData } = useQuery({
+    queryKey: ['sessions', 'cost-trend-fallback'],
+    queryFn: () => getSessions({ limit: 200 }),
+    enabled: !costData || !('dailyCosts' in costData) || costData.dailyCosts.length === 0,
   });
 
   let chartData: { date: string; cost: number; sessions: number }[] = [];
@@ -21,29 +27,22 @@ export function CostTrendChart() {
     chartData = costData.dailyCosts
       .sort((a, b) => a.date.localeCompare(b.date))
       .map((d) => ({
-        date: d.date.slice(5), // MM-DD
+        date: d.date.slice(5),
         cost: Math.round(d.cost * 10000) / 10000,
         sessions: d.sessionCount,
       }));
-  } else {
-    // Fallback: compute from sessions table (works when import script updates total_cost)
-    const { data: sessionsData } = useQuery({
-      queryKey: ['sessions', 'cost-trend-fallback'],
-      queryFn: () => getSessions({ limit: 200 }),
-    });
-    if (sessionsData?.sessions) {
-      const dailyMap = new Map<string, { cost: number; count: number }>();
-      for (const s of sessionsData.sessions) {
-        const day = new Date(s.startedAt).toISOString().split('T')[0]!;
-        const e = dailyMap.get(day) || { cost: 0, count: 0 };
-        e.cost += s.totalCost || 0;
-        e.count += 1;
-        dailyMap.set(day, e);
-      }
-      chartData = Array.from(dailyMap.entries())
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([date, d]) => ({ date: date.slice(5), cost: Math.round(d.cost * 10000) / 10000, sessions: d.count }));
+  } else if (sessionsData?.sessions) {
+    const dailyMap = new Map<string, { cost: number; count: number }>();
+    for (const s of sessionsData.sessions) {
+      const day = new Date(s.startedAt).toISOString().split('T')[0]!;
+      const e = dailyMap.get(day) || { cost: 0, count: 0 };
+      e.cost += s.totalCost || 0;
+      e.count += 1;
+      dailyMap.set(day, e);
     }
+    chartData = Array.from(dailyMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, d]) => ({ date: date.slice(5), cost: Math.round(d.cost * 10000) / 10000, sessions: d.count }));
   }
 
   if (isLoading) {
