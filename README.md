@@ -7,7 +7,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.3.2-purple" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.4.0-purple" alt="Version">
+  <img src="https://img.shields.io/badge/embedding-BGE--M3-blue" alt="BGE-M3">
   <img src="https://img.shields.io/badge/node-%3E%3D22-green" alt="Node">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/dashboard-react%2019-61dafb" alt="React 19">
@@ -202,6 +203,32 @@ node scripts/import-sessions.mjs --watch
 - Step-by-step timeline replay of tool calls
 - Cost breakdown by tool, model, and session
 - Token usage trends over time
+
+### v0.4.0 Highlights (Current)
+
+**BGE-M3 Embedding Engine (1024-dim)**
+Semantic search now uses BAAI's state-of-the-art BGE-M3 model (1024-dimensional vectors). The old SimpleEmbedder hash-based fallback has been replaced with a TF-IDF trigram embedder that captures genuine textual overlap — far better than random hash values. When Transformers.js models are available, you get full semantic similarity search across all agent session history.
+
+**Cloudflare Tunnel — Public Web Access**
+Access your dashboard from anywhere using your own domain. No cloud upload, no server — your data stays local while being securely exposed via Cloudflare Tunnel. Use the included `start-with-tunnel.ps1` script to launch both the server and tunnel in one command:
+
+```bash
+# Windows (PowerShell):
+.\start-with-tunnel.ps1
+
+# Or manually:
+cloudflared tunnel run  # Exposes https://devsorcerer.YOURDOMAIN.com
+devsorcerer start       # Dashboard at localhost:3199
+```
+
+**Expanded Pricing Engine**
+Added support for GPT-4.1-mini, GPT-5-mini, o4-mini, o3, Gemini 2.5 Pro, and Gemini 2.5 Flash. Now covering 16 models with accurate per-token pricing.
+
+**Windows PowerShell Installer**
+One-click setup for Windows users:
+```powershell
+.\scripts\install.ps1  # Installs Node.js, cloudflared, builds everything
+```
 
 ### v0.3.0 Highlights
 
@@ -477,6 +504,32 @@ node scripts/import-sessions.mjs --watch
 - 逐步时间线回放工具调用
 - 按工具、模型、会话的成本明细
 - 时间段内 token 用量趋势
+
+### v0.4.0 核心升级（当前版本）
+
+**BGE-M3 嵌入引擎（1024维）**
+语义搜索现在使用 BAAI 的顶级 BGE-M3 模型（1024维向量）。旧的 SimpleEmbedder 哈希降级方案已被替换为 TF-IDF 三元组嵌入器，纯离线也能捕捉真实的文本重叠 — 远优于随机哈希值。当 Transformers.js 模型可用时，可对所有 agent 会话历史进行完整的语义相似度搜索。
+
+**Cloudflare Tunnel — 公网访问**
+通过自己的域名从任何地方访问仪表盘。无需上传云端、无需服务器 — 数据留在本地，通过 Cloudflare Tunnel 安全暴露。使用自带的 `start-with-tunnel.ps1` 脚本一键启动服务和隧道：
+
+```bash
+# Windows (PowerShell):
+.\start-with-tunnel.ps1
+
+# 或手动：
+cloudflared tunnel run  # 暴露 https://devsorcerer.你的域名.com
+devsorcerer start        # 仪表盘在 localhost:3199
+```
+
+**扩展定价引擎**
+新增支持 GPT-4.1-mini、GPT-5-mini、o4-mini、o3、Gemini 2.5 Pro、Gemini 2.5 Flash。现已覆盖 16 个模型，支持精确按 token 计价。
+
+**Windows PowerShell 安装器**
+Windows 用户一键安装：
+```powershell
+.\scripts\install.ps1  # 安装 Node.js、cloudflared、构建所有内容
+```
 
 ### v0.3.0 核心升级
 

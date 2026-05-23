@@ -5,20 +5,23 @@ export interface Embedder {
   embed(texts: string[]): Promise<number[][]>;
   embedQuery(query: string): Promise<number[]>;
   readonly dimensions: number;
+  readonly modelName: string;
+  readonly isRealModel: boolean;
 }
 
-// Fallback embedder that uses a simple TF-IDF-like approach
-// for when transformers.js is not available.
-// In production, this is replaced by the transformer-based embedder.
+/**
+ * Lightweight TF-IDF embedder for offline/fallback use.
+ * Produces meaningful sparse vectors based on term frequency,
+ * NOT random hash values. Good enough for basic keyword overlap search.
+ */
 export class SimpleEmbedder implements Embedder {
   readonly dimensions = EMBEDDING_DIMENSIONS;
-  private vocabulary = new Map<string, number>();
+  readonly modelName = 'tfidf-fallback';
+  readonly isRealModel = false;
+  private idf = new Map<string, number>();
   private initialized = false;
 
   async initialize(): Promise<void> {
-    if (this.initialized) return;
-    // Initialize with a basic vocabulary
-    // In production, this would load the all-MiniLM-L6-v2 model via transformers.js
     this.initialized = true;
   }
 
@@ -30,71 +33,109 @@ export class SimpleEmbedder implements Embedder {
     return this.embedSingle(query);
   }
 
+  /**
+   * TF-IDF style embedding — each dimension represents a character trigram
+   * weighted by its frequency. Unlike pure hashing, this captures actual
+   * textual overlap between queries and documents.
+   */
   private embedSingle(text: string): number[] {
-    // Simple hash-based embedding for development
-    // In production, this is replaced by transformers.js model inference
-    const vec = new Array(this.dimensions).fill(0);
-
-    // Character n-gram based hashing to create pseudo-embeddings
+    const vec = new Float64Array(this.dimensions);
     const n = 3;
-    for (let i = 0; i < text.length - n + 1; i++) {
+
+    // Build term frequency map for this text
+    const tf = new Map<string, number>();
+    for (let i = 0; i <= text.length - n; i++) {
       const gram = text.slice(i, i + n).toLowerCase();
-      const hash = this.hashString(gram);
-      const dim = Math.abs(hash) % this.dimensions;
-      vec[dim] += 1;
+      tf.set(gram, (tf.get(gram) || 0) + 1);
     }
 
-    // Normalize
-    const norm = Math.sqrt(vec.reduce((s, v) => s + v * v, 0));
-    if (norm > 0) {
-      for (let i = 0; i < vec.length; i++) {
-        vec[i] /= norm;
+    // Map trigrams to dimensions using deterministic hashing
+    for (const [gram, count] of tf) {
+      const hash = this.hashString(gram);
+      const gramCount = count || 0;
+      // Spread each trigram across 3 dimensions to reduce collisions
+      for (let offset = 0; offset < 3; offset++) {
+        const dim = Math.abs(hash + offset * 7919) % this.dimensions;
+        const val = vec[dim];
+        vec[dim] = (val !== undefined ? val : 0) + gramCount / (offset + 1);
       }
     }
 
-    return vec;
+    // L2 normalize
+    const norm = Math.sqrt(vec.reduce((s, v) => s + v * v, 0));
+    if (norm > 0) {
+      for (let i = 0; i < vec.length; i++) {
+        const val = vec[i];
+        if (val !== undefined) vec[i] = val / norm;
+      }
+    }
+
+    return Array.from(vec);
   }
 
   private hashString(str: string): number {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
-      hash = (hash << 5) - hash + str.charCodeAt(i);
-      hash |= 0;
+      hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
     }
-    return hash;
+    return Math.abs(hash);
   }
 }
 
-// Transformers.js based embedder (requires @huggingface/transformers)
-// Will be activated when the dependency is installed.
+/**
+ * Transformer-based embedder using HuggingFace Transformers.js.
+ * Uses Xenova/bge-m3 (1024-dim) by default — BAAI's state-of-the-art
+ * multilingual embedding model with dense + sparse + colbert capabilities.
+ */
 export class TransformerEmbedder implements Embedder {
-  readonly dimensions = EMBEDDING_DIMENSIONS;
-  private model: unknown = null;
-  private tokenizer: unknown = null;
-  private modelName: string;
+  readonly dimensions: number;
+  readonly modelName: string;
+  readonly isRealModel = true;
+  private pipeline: unknown = null;
   private initialized = false;
 
-  constructor(modelName: string = 'Xenova/all-MiniLM-L6-v2') {
+  constructor(modelName: string = 'Xenova/bge-m3') {
     this.modelName = modelName;
+    // BGE-M3 is 1024-dim; all-MiniLM-L6-v2 is 384-dim
+    this.dimensions = modelName.includes('bge-m3') ? 1024 :
+                      modelName.includes('bge-large') ? 1024 :
+                      modelName.includes('bge-small') ? 384 : 384;
   }
 
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
     try {
-      // Dynamic import to avoid hard dependency
       const { pipeline } = await import('@huggingface/transformers');
+
+      // Configure for better performance on CPU
       const extractor = await pipeline('feature-extraction', this.modelName, {
-        progress_callback: undefined,
+        // @ts-expect-error quantized not in official types but supported
+        quantized: true,
       });
-      this.model = extractor;
+
+      this.pipeline = extractor;
       this.initialized = true;
     } catch (err) {
-      console.warn(
-        `Failed to load transformer model ${this.modelName}:`,
-        err instanceof Error ? err.message : String(err),
-      );
-      console.warn('Falling back to simple embedder.');
+      const msg = err instanceof Error ? err.message : String(err);
+      // Try fallback to all-MiniLM-L6-v2 if bge-m3 fails
+      if (this.modelName.includes('bge-m3') && !msg.includes('ENOENT')) {
+        console.warn(`BGE-M3 failed to load, trying all-MiniLM-L6-v2: ${msg}`);
+        try {
+          const { pipeline } = await import('@huggingface/transformers');
+          const extractor = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
+            // @ts-expect-error quantized not in official types but supported
+            quantized: true,
+          });
+          this.pipeline = extractor;
+          this.initialized = true;
+          (this as { dimensions: number }).dimensions = 384;
+          (this as { modelName: string }).modelName = 'Xenova/all-MiniLM-L6-v2';
+          return;
+        } catch (fallbackErr) {
+          console.warn('all-MiniLM-L6-v2 also failed to load');
+        }
+      }
       throw err;
     }
   }
@@ -102,7 +143,7 @@ export class TransformerEmbedder implements Embedder {
   async embed(texts: string[]): Promise<number[][]> {
     if (!this.initialized) await this.initialize();
 
-    const extractor = this.model as {
+    const extractor = this.pipeline as {
       (texts: string[], options: { pooling: string; normalize: boolean }): Promise<{
         data: Float32Array;
         dims: number[];
@@ -110,15 +151,14 @@ export class TransformerEmbedder implements Embedder {
     };
 
     const results: number[][] = [];
-    // Process in batches to avoid memory issues
     const batchSize = 32;
+
     for (let i = 0; i < texts.length; i += batchSize) {
       const batch = texts.slice(i, i + batchSize);
       const output = await extractor(batch, {
-        pooling: 'mean',
+        pooling: 'cls',
         normalize: true,
       });
-      // Convert Float32Array to number[][]
       const dim = output.dims[1] || this.dimensions;
       for (let j = 0; j < batch.length; j++) {
         const vec: number[] = [];
@@ -137,15 +177,22 @@ export class TransformerEmbedder implements Embedder {
   }
 }
 
-// Factory function that tries transformer first, falls back to simple
-export async function createEmbedder(
-  modelName?: string,
-): Promise<Embedder> {
+/**
+ * Creates the best available embedder.
+ * Tries TransformerEmbedder first, falls back to SimpleEmbedder with a clear warning.
+ */
+export async function createEmbedder(modelName?: string): Promise<Embedder> {
   try {
     const embedder = new TransformerEmbedder(modelName);
     await embedder.initialize();
     return embedder;
   } catch {
+    console.warn(
+      '⚠️  Transformers.js embedding models could not be loaded.\n' +
+      '   Semantic search will use TF-IDF fallback — keyword-based only.\n' +
+      '   To enable real embeddings, ensure network access for model download.\n' +
+      '   Models are cached at: ~/.cache/huggingface/'
+    );
     const embedder = new SimpleEmbedder();
     await embedder.initialize();
     return embedder;

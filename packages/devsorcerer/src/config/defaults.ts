@@ -6,7 +6,7 @@ export const defaultConfig: DevSorcererConfig = {
   lancedbPath: '.vault/lancedb',
   serverPort: 3199,
   pricing: { ...DEFAULT_PRICING },
-  embeddingModel: 'Xenova/all-MiniLM-L6-v2',
+  embeddingModel: 'Xenova/bge-m3',
   anonymizeExport: false,
   dashboardEnabled: true,
   captureEnabled: true,

@@ -56,7 +56,7 @@
       "outputPer1k": 0.015
     }
   },
-  "embeddingModel": "Xenova/all-MiniLM-L6-v2",
+  "embeddingModel": "Xenova/bge-m3",
   "anonymizeExport": false,
   "dashboardEnabled": true,
   "captureEnabled": true
